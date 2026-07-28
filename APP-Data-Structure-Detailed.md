@@ -248,7 +248,7 @@ roster against which session attendance is checked for completeness.
 | course_status | Text, One of ('in_progress','completed','dropout') | Progress through the programme. |
 | course_status_description | Text | Reason, required when `course_status = 'dropout'` — e.g. got a job, left the country. |
 | dropout_date | Date | Date the student left, when `course_status = 'dropout'`. Needed so attendance completeness checks stop expecting rows for sessions after departure. |
-| certificate_status | Text, One of ('not_issued','issued') | Whether the completion certificate has been issued. |
+| certificate_status | Text, One of ('not_issued','issued') | Whether the completion certificate has been issued. **Must not move to `issued` unless the student's attendance is at least 80%** — see rules 6 and 7 under table 19. |
 | certificate_id | UUID (FK → certificates.id) | The certificate template used. Null until issued. |
 | active | Boolean, Default TRUE | Soft-delete flag. |
 | created_at | Timestamptz, Default now() | Record creation time. |
@@ -510,7 +510,17 @@ HAVING COUNT(DISTINCT sa.student_id) < COUNT(DISTINCT so.student_id);
    The `dropout_date` condition stops the check demanding attendance for students who had already
    left. This is why that column was added to table 8.
 
-5. **Attendance percentage.** Per-student figures for a batch, for certification eligibility:
+5. **Attendance percentage — confirmed policy.** Two rules are fixed and must be applied
+   consistently everywhere attendance is reported:
+
+   - **`present` and `late` both count as attended.** A student who arrived late still attended;
+     lateness is recorded for pastoral follow-up, not penalised in the percentage.
+   - **`excused` is removed from the denominator entirely.** An approved absence neither helps nor
+     harms — the student is measured only against the sessions they were actually expected at. This
+     is why `excused` must be a distinct status and not merged into `absent`.
+
+   So the denominator is *conducted sessions the student was expected at, excluding excused
+   absences*, and the numerator is *present + late*:
 
 ```sql
 SELECT sa.student_id,
@@ -528,12 +538,72 @@ WHERE sa.active
 GROUP BY sa.student_id;
 ```
 
-   This treats `late` as attended and drops `excused` from the denominator entirely, so an approved
-   absence neither helps nor harms the student. **Both are policy choices** — if excused absences
-   should count against a student, remove the `countable` filter. Decide this once and apply it
-   consistently, because it changes who qualifies for a certificate.
+6. **Certification requires 80% attendance.** A single global floor, identical for every batch and
+   both tracks. It is a fixed business rule, not configuration data, so it is **not** stored as a
+   column — hardcode it as one named application constant (`MIN_ATTENDANCE_PCT = 80`) referenced
+   everywhere, rather than as a literal `80` scattered through the codebase. If it ever needs to vary
+   by batch, add `min_attendance_pct Numeric(5,2) Default 80` to Batches and read it from there; no
+   other change is required.
 
-6. **Attendance is not billing.** A trainer is paid for delivering the session regardless of how many
+   Eligibility for a batch:
+
+```sql
+WITH attendance AS (
+    SELECT sa.student_id,
+           COUNT(*) FILTER (WHERE sa.attendance_status IN ('present','late')) AS attended,
+           COUNT(*) FILTER (WHERE sa.attendance_status <> 'excused')          AS countable
+    FROM session_attendance sa
+    JOIN class_session cs
+         ON cs.id = sa.class_session_id
+        AND cs.class_status = 'conducted'
+        AND cs.active
+    WHERE sa.active
+      AND cs.batch_id = :batch_id
+    GROUP BY sa.student_id
+)
+SELECT student_id,
+       attended,
+       countable,
+       ROUND(100.0 * attended / NULLIF(countable, 0), 2)      AS attendance_pct,
+       (100.0 * attended / NULLIF(countable, 0)) >= 80        AS meets_threshold
+FROM attendance
+ORDER BY attendance_pct;
+```
+
+   A student with no countable sessions yields `NULL` rather than `0` — `NULLIF` prevents a
+   division-by-zero, and `NULL >= 80` is `NULL`, not `TRUE`. Such a student is neither eligible nor
+   ineligible; they simply have no attendance record yet, and the application must treat that as
+   "not eligible" explicitly rather than relying on the comparison.
+
+7. **The 80% floor gates certificate issuance.** `student_selection_onboarding.certificate_status`
+   must not move to `issued` while a student is below the threshold. Compliance check — anyone
+   already issued a certificate who should not have been:
+
+```sql
+WITH attendance AS (
+    SELECT cs.batch_id,
+           sa.student_id,
+           ROUND(100.0 * COUNT(*) FILTER (WHERE sa.attendance_status IN ('present','late'))
+                 / NULLIF(COUNT(*) FILTER (WHERE sa.attendance_status <> 'excused'), 0), 2) AS pct
+    FROM session_attendance sa
+    JOIN class_session cs
+         ON cs.id = sa.class_session_id
+        AND cs.class_status = 'conducted'
+        AND cs.active
+    WHERE sa.active
+    GROUP BY cs.batch_id, sa.student_id
+)
+SELECT so.batch_id, so.student_id, a.pct
+FROM student_selection_onboarding so
+LEFT JOIN attendance a
+       ON a.batch_id = so.batch_id
+      AND a.student_id = so.student_id
+WHERE so.active
+  AND so.certificate_status = 'issued'
+  AND (a.pct IS NULL OR a.pct < 80);
+```
+
+8. **Attendance is not billing.** A trainer is paid for delivering the session regardless of how many
    students turned up. Nothing in this table feeds Billing.
 
 ## 20. Assessment Table
@@ -832,7 +902,8 @@ availability (slot)                      panel_sessions
 ```
 student_selection_onboarding (who is enrolled in the batch)
    └─> session_attendance (one row per student per conducted session)
-          └─> attendance % ──> certification eligibility
+          └─> attendance % = (present + late) / (all statuses except excused)
+                 └─> >= 80% ──> certificate_status may become 'issued'
 ```
 
 ---
@@ -841,26 +912,31 @@ student_selection_onboarding (who is enrolled in the batch)
 
 ## Resolved in this revision
 
+17. **Attendance policy fixed.** The certification floor is **80%, identical for every batch** — a
+    business rule held as an application constant, not a column. `present` and `late` both count as
+    attended; `excused` is excluded from the denominator. Added the eligibility query, the rule
+    barring `certificate_status = 'issued'` below the floor, and a compliance query listing
+    certificates already issued in breach of it.
+
+## Earlier revisions
+
 16. **Per-student attendance added.** `class_session.attendance_register_taken` recorded only *that*
     a register was taken, never who was present. Added **Session Attendance (table 19)**, one row per
     student per conducted session, with a unique constraint on `(class_session_id, student_id)`, a
     completeness query for the mandatory rule, and an attendance-percentage query for certification
     eligibility. Added `dropout_date` to table 8 so completeness checks stop expecting rows for
     students who had already left.
-
-## Earlier revisions
-
+15. **Three-panelist cap confirmed as intended**, along with the three college-contact columns.
+14. **Phase groupings removed.** Tables are organised by functional domain.
+13. **A subject can be taught by multiple trainers within one batch.** Removed `subjects.trainer_id`
+    and added **Subject Trainer Mapping (table 13)** keyed on subject, trainer and batch.
 12. **Panel member payment path added.** Panel members are paid per hour on the same basis as
     trainers, but there was no record of their hours and no way to invoice them. Added **Panel
     Sessions (table 7)**, `panel_member_id` on Billing with a CHECK enforcing exactly one payee, and
     `panel_session_id` plus a `panel_hours` line type on Billing Line Items.
-13. **A subject can be taught by multiple trainers within one batch.** Removed `subjects.trainer_id`
-    and added **Subject Trainer Mapping (table 13)** keyed on subject, trainer and batch.
-14. **Phase groupings removed.** Tables are organised by functional domain.
-15. **Three-panelist cap confirmed as intended**, along with the three college-contact columns.
-10. **Student Evaluation had no `student_id`.** Added `student_id UUID (FK → students.id, Not Null)`.
 11. **Added Billing Line Items**, linking invoices to the sessions that justify them, with a
     snapshotted `rate_applied` and a unique-when-active session reference preventing double billing.
+10. **Student Evaluation had no `student_id`.** Added `student_id UUID (FK → students.id, Not Null)`.
 
 ## Corrections to the original PDF
 
@@ -884,14 +960,11 @@ student_selection_onboarding (who is enrolled in the batch)
 
 # Open Items
 
-**Excused absences — policy not yet fixed.** The attendance-percentage query in table 19 drops
-`excused` from the denominator, so an approved absence neither helps nor harms. If excused absences
-should instead count against a student, the query changes and so does who qualifies for a
-certificate. Needs a one-time decision.
-
-**No minimum attendance threshold is stored.** Certification eligibility presumably requires some
-attendance percentage, but no table holds it. If the threshold varies by batch or track, it belongs
-on Batches; if it is a single global rule, application configuration is enough.
+**No approval trail for `excused` absences.** Marking an absence excused rather than absent lifts it
+out of the denominator, so it directly improves a student's percentage and can decide certification.
+The table records who marked it (`marked_by`) but not who *authorised* it or against what evidence —
+a medical note, an exam clash. If excused marks need to be defensible under audit, add an approver
+reference and a supporting-document URL.
 
 **Trainer Batch Mapping partially overlaps Subject Trainer Mapping.** Table 16 is derivable from
 table 13 and the two can drift. Worth deciding whether to keep both — see the note under table 16.
