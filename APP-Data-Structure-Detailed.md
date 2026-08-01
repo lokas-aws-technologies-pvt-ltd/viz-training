@@ -960,15 +960,26 @@ student_selection_onboarding (who is enrolled in the batch)
 
 # Open Items
 
-**No approval trail for `excused` absences.** Marking an absence excused rather than absent lifts it
-out of the denominator, so it directly improves a student's percentage and can decide certification.
-The table records who marked it (`marked_by`) but not who *authorised* it or against what evidence —
-a medical note, an exam clash. If excused marks need to be defensible under audit, add an approver
-reference and a supporting-document URL.
-
 **Trainer Batch Mapping partially overlaps Subject Trainer Mapping.** Table 16 is derivable from
 table 13 and the two can drift. Worth deciding whether to keep both — see the note under table 16.
 
 **Entrance weights assume all three panelists score.** If a candidate is seen by only one or two, the
 weights no longer sum to 1 and the total score is understated. Needs either a redistribution rule or
 normalization by the weights actually used.
+
+---
+
+# Accepted for This Version
+
+Considered and deliberately deferred — not oversights. Recorded so they are not re-raised as bugs,
+and so the reasoning is available if they are revisited.
+
+**`excused` absences carry no approval trail.** `session_attendance.marked_by` records who entered
+the mark, but nothing records who *authorised* the excusal or against what evidence. Because
+`excused` is excluded from the attendance denominator, marking an absence excused rather than absent
+raises a student's percentage and can move them across the 80% certification line — so whoever takes
+the register can affect eligibility without a second signature. Accepted for this version.
+
+Should it need tightening later, the change is additive and requires no migration of existing rows:
+add `excused_approved_by UUID (FK → users.id)` and `excused_evidence_url Text` to Session
+Attendance, both null except on `excused` rows.
