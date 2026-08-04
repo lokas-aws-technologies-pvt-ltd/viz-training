@@ -154,13 +154,19 @@ when the formula changes.
 | hod_feedback_weight | Numeric(5,4) | Weight applied to the Head of Department's rating. |
 | panel_member_1_weight | Numeric(5,4) | Weight for the first panel interviewer's score. |
 | panel_member_2_weight | Numeric(5,4) | Weight for the second panel interviewer's score. |
-| panel_member_3_weight | Numeric(5,4) | Weight for the third panel interviewer's score. A maximum of three panelists is a confirmed business rule. |
+| panel_member_3_weight | Numeric(5,4) | Weight for the third panel interviewer's score. Exactly three panelists score every candidate, so all three weights always apply. |
 | effective_from | Date (Not Null) | Date this weighting takes effect. Scoring uses the latest set at or before the evaluation date. |
 | active | Boolean, Default TRUE | Soft-delete flag. |
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
-> **Validation:** the seven weights should sum to `1.0000`. Enforce in the application or as a CHECK constraint — `Numeric(5,4)` alone does not guarantee it. Where a candidate is seen by fewer than three panelists, the unused weights must be redistributed or the total will fall short of 1.
+> **Validation:** the seven weights must sum to `1.0000`. `Numeric(5,4)` alone does not guarantee it, so enforce it directly:
+> ```sql
+> CHECK (university_marks_weight + attendance_weight + igiver_aptitude_weight
+>        + hod_feedback_weight + panel_member_1_weight + panel_member_2_weight
+>        + panel_member_3_weight = 1.0000)
+> ```
+> Because every candidate is seen by exactly three panelists, all three panel weights always apply — there is no partial-panel case and no redistribution rule to write.
 
 ## 6. Entrance Exam Scores Table
 
@@ -184,7 +190,7 @@ plus the computed weighted total that drives ranking and selection.
 | panel_member_2_id | UUID (FK → panel_members.id) | Second interviewer. |
 | panel_member_2_score | Numeric(5,2) | Second interviewer's score. |
 | panel_member_2_feedback | Text | Second interviewer's remarks. |
-| panel_member_3_id | UUID (FK → panel_members.id) | Third interviewer. Three is the maximum by business rule. |
+| panel_member_3_id | UUID (FK → panel_members.id) | Third interviewer. Every candidate is seen by exactly three — see the note below. |
 | panel_member_3_score | Numeric(5,2) | Third interviewer's score. |
 | panel_member_3_feedback | Text | Third interviewer's remarks. |
 | family_income | Numeric(12,2) | Declared annual family income in INR. Eligibility is capped at ₹4 lakh; evidenced by the certificate in table 8. |
@@ -193,6 +199,17 @@ plus the computed weighted total that drives ranking and selection.
 | active | Boolean, Default TRUE | Soft-delete flag. |
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
+
+> **All three panelists always score.** Every candidate is seen by exactly three interviewers — partial panels do not occur. The `panel_member_{1,2,3}_id` and `_score` columns are nullable **only** to permit progressive entry while the interview window is still open, since panelists commonly sit on different days. They are not optional. Before a candidate can be scored or selected, all six must be populated:
+> ```sql
+> CHECK (
+>   (total_weighted_score IS NULL AND selected IS NOT TRUE)
+>   OR (panel_member_1_id IS NOT NULL AND panel_member_1_score IS NOT NULL
+>   AND  panel_member_2_id IS NOT NULL AND panel_member_2_score IS NOT NULL
+>   AND  panel_member_3_id IS NOT NULL AND panel_member_3_score IS NOT NULL)
+> )
+> ```
+> This guards the outcome rather than the row, so a half-interviewed candidate can be saved but never scored or selected on an incomplete panel. If scores are instead only ever entered in one sitting after all three interviews finish, tighten those six columns to `Not Null` and drop the CHECK. The three `_feedback` columns stay optional either way — a panelist must score, but written remarks are discretionary.
 
 > **Two different attendances.** `year1_attendance` and `year2_attendance` are the candidate's attendance *at their college*, self-reported at entrance and used for selection. In-course attendance on the training programme is a separate thing entirely, recorded per session in table 18.
 
@@ -927,14 +944,19 @@ student_selection_onboarding (who is enrolled in the batch)
 
 ## Resolved in this revision
 
+19. **Panels are always exactly three people.** Partial panels do not occur, so the entrance weights
+    always sum to `1.0000` with no redistribution case — now enforced as a CHECK on table 5. Added a
+    CHECK on table 6 barring `total_weighted_score` and `selected` from being set unless all three
+    panelist IDs and scores are present, which guards the outcome while still allowing scores to be
+    entered progressively across a multi-day interview window.
+
+## Earlier revisions
+
 18. **Trainer Batch Mapping dropped.** The table stored `(trainer_id, batch_id)`, both of which
     Subject Trainer Mapping already carries — so it duplicated one fact across two tables that could
     disagree, with no mechanism to keep them aligned. Trainer↔batch is now derived with
     `SELECT DISTINCT trainer_id, batch_id FROM subject_trainer_mapping WHERE active`, optionally
     wrapped in a `trainer_batch` view. Tables after it renumbered; the schema is now 28 tables.
-
-## Earlier revisions
-
 17. **Attendance policy fixed.** The certification floor is **80%, identical for every batch** — a
     business rule held as an application constant, not a column. `present` and `late` both count as
     attended; `excused` is excluded from the denominator. Added the eligibility query, the rule
@@ -980,9 +1002,8 @@ student_selection_onboarding (who is enrolled in the batch)
 
 # Open Items
 
-**Entrance weights assume all three panelists score.** If a candidate is seen by only one or two, the
-weights no longer sum to 1 and the total score is understated. Needs either a redistribution rule or
-normalization by the weights actually used.
+**None.** Every question raised during review has been answered and folded into the schema above.
+Two conscious deferrals are recorded below; they are decisions, not unknowns.
 
 ---
 
