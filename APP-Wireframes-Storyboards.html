@@ -1,0 +1,1154 @@
+<title>Igiver Training Platform — Wireframes & Storyboards</title>
+<style>
+:root{
+  --bg:#F4F6F7; --panel:#FDFDFC; --sheet:#F7F8F9; --box:#EBEEF0;
+  --ink:#212930; --mut:#6B7883; --line:#A9B4BC; --edge:#DCE2E6;
+  --acc:#2E5E9E; --acc-soft:#E3EBF5; --qn:#B3452E; --qn-soft:#F6E7E2;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#15191C; --panel:#1C2125; --sheet:#20262A; --box:#2A3237;
+  --ink:#DDE3E7; --mut:#8B98A2; --line:#55636D; --edge:#313A40;
+  --acc:#82ABDC; --acc-soft:#243547; --qn:#DB9078; --qn-soft:#3D2A24;
+}}
+:root[data-theme="dark"]{
+  --bg:#15191C; --panel:#1C2125; --sheet:#20262A; --box:#2A3237;
+  --ink:#DDE3E7; --mut:#8B98A2; --line:#55636D; --edge:#313A40;
+  --acc:#82ABDC; --acc-soft:#243547; --qn:#DB9078; --qn-soft:#3D2A24;
+}
+:root[data-theme="light"]{
+  --bg:#F4F6F7; --panel:#FDFDFC; --sheet:#F7F8F9; --box:#EBEEF0;
+  --ink:#212930; --mut:#6B7883; --line:#A9B4BC; --edge:#DCE2E6;
+  --acc:#2E5E9E; --acc-soft:#E3EBF5; --qn:#B3452E; --qn-soft:#F6E7E2;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased}
+code,.mono{font-family:ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace}
+a{color:var(--acc)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px 110px}
+
+/* ---------- page chrome ---------- */
+.topnav{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid var(--edge)}
+.topnav .in-nav{max-width:1100px;margin:0 auto;padding:10px 24px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.topnav a{font-family:ui-monospace,monospace;font-size:12px;text-decoration:none;color:var(--mut);letter-spacing:.04em}
+.topnav a:hover{color:var(--acc)}
+.topnav .brand{color:var(--ink);font-weight:600}
+header.hero{padding:58px 0 8px}
+.eyebrow{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:0 0 10px}
+h1{font-size:34px;line-height:1.15;margin:0 0 14px;font-weight:700;letter-spacing:-.015em;text-wrap:balance}
+.lede{max-width:64ch;color:var(--mut);margin:0 0 8px}
+.lede b{color:var(--ink);font-weight:600}
+.decisions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 0;padding:0;list-style:none}
+.decisions li{font-family:ui-monospace,monospace;font-size:12px;padding:5px 12px;border:1px solid var(--edge);border-radius:999px;background:var(--panel);color:var(--mut)}
+.decisions li b{color:var(--ink);font-weight:600}
+h2{font-size:22px;margin:64px 0 6px;letter-spacing:-.01em;scroll-margin-top:70px}
+h2 .cnt{font-family:ui-monospace,monospace;font-size:13px;color:var(--mut);font-weight:400;margin-left:8px}
+.secl{max-width:68ch;color:var(--mut);font-size:14px;margin:0 0 18px}
+hr.rule{border:0;border-top:1px solid var(--edge);margin:56px 0 0}
+
+/* ---------- legend ---------- */
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:18px 0 0}
+.lg{background:var(--panel);border:1px solid var(--edge);border-radius:8px;padding:12px;font-size:12.5px;color:var(--mut)}
+.lg .demo{height:34px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+
+/* ---------- IA map ---------- */
+.ia{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:20px 0 0}
+.iacol{background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:16px}
+.iacol h3{margin:0 0 4px;font-size:15px}
+.iacol .who{font-size:12.5px;color:var(--mut);margin:0 0 12px}
+.iacol ul{list-style:none;margin:0;padding:0;font-size:13px}
+.iacol li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--edge)}
+.iacol li code{color:var(--acc);font-size:11.5px;white-space:nowrap}
+
+/* ---------- sheets (wireframes) ---------- */
+.sheet{margin:26px 0;border:1px solid var(--edge);border-radius:12px;background:var(--panel);overflow:hidden;scroll-margin-top:70px}
+.shead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--edge)}
+.shead .code{font-family:ui-monospace,monospace;font-size:12px;color:var(--acc);letter-spacing:.06em}
+.shead .nm{font-weight:600;font-size:15px}
+.shead .route{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--mut);margin-left:auto}
+.tag{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.tag.adm{border-color:var(--acc);color:var(--acc)}
+.sbody{display:grid;grid-template-columns:minmax(0,1fr) 252px;gap:18px;padding:18px}
+@media (max-width:900px){.sbody{grid-template-columns:1fr}}
+
+/* frame canvas */
+.wf{background:var(--sheet);border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:11.5px;color:var(--mut)}
+.tbar{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--line)}
+.dot{width:8px;height:8px;border-radius:50%;border:1px solid var(--line)}
+.crumb{font-family:ui-monospace,monospace;font-size:10.5px;margin-left:6px}
+.pad{padding:12px;display:flex;flex-direction:column;gap:8px}
+.r{display:flex;gap:8px;align-items:stretch}
+.r.mid{align-items:center}
+.grow{flex:1;min-width:0}
+.bx{border:1px dashed var(--line);border-radius:4px;background:var(--box);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:6px 8px;min-height:30px;line-height:1.3}
+.bx.plain{background:transparent}
+.bx.tl{align-items:flex-start;justify-content:flex-start;text-align:left}
+.x{position:relative;overflow:hidden}
+.x::before{content:"";position:absolute;inset:0;
+  background:linear-gradient(to top right,transparent calc(50% - .5px),var(--line),transparent calc(50% + .5px)),
+             linear-gradient(to bottom right,transparent calc(50% - .5px),var(--line),transparent calc(50% + .5px))}
+.btn{border:1px solid var(--ink);border-radius:999px;background:transparent;color:var(--ink);
+  font-family:ui-monospace,monospace;font-size:10.5px;padding:4px 12px;white-space:nowrap;
+  display:inline-flex;align-items:center;justify-content:center}
+.btn.p{background:var(--ink);color:var(--sheet)}
+.btn.dis{opacity:.4;border-style:dashed}
+.in{border:1px solid var(--line);border-radius:4px;background:var(--panel);min-height:28px;
+  display:flex;align-items:center;padding:0 8px;color:var(--mut)}
+.fld{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.lb{font-family:ui-monospace,monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase}
+.tb{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:4px;font-size:11px}
+.tb th{font-family:ui-monospace,monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);color:var(--mut);font-weight:500}
+.tb td{padding:6px 8px;border-top:1px solid var(--edge);color:var(--ink)}
+.tb td.m{color:var(--mut)}
+.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:1px 8px;font-family:ui-monospace,monospace;font-size:9.5px;white-space:nowrap}
+.pill.f{background:var(--box)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.seg span{padding:3px 8px;font-family:ui-monospace,monospace;font-size:9.5px;border-left:1px solid var(--line)}
+.seg span:first-child{border-left:0}
+.seg .on{background:var(--ink);color:var(--sheet)}
+.sideb{width:150px;flex:none;display:flex;flex-direction:column;gap:6px}
+.navi{padding:5px 9px;border-radius:4px;font-family:ui-monospace,monospace;font-size:10.5px}
+.navi.on{background:var(--box);color:var(--ink);border:1px solid var(--line)}
+.stat{flex:1;border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:8px 10px}
+.stat .k{font-family:ui-monospace,monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em}
+.stat .v{font-size:18px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.warn{border:1px dashed var(--line);border-radius:5px;padding:6px 10px;font-family:ui-monospace,monospace;font-size:10px;background:var(--box)}
+
+/* annotations */
+.ann{font-size:12.5px;color:var(--mut)}
+.ann h4{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);margin:14px 0 6px;font-weight:600}
+.ann h4:first-child{margin-top:0}
+.ann ul{list-style:none;margin:0;padding:0}
+.ann li{padding:3px 0;display:flex;gap:7px;align-items:baseline}
+.ann code{font-size:11px;color:var(--acc);word-break:break-word}
+.rw{font-family:ui-monospace,monospace;font-size:9px;border:1px solid var(--line);border-radius:3px;padding:0 4px;color:var(--mut);flex:none}
+.qref{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--qn);background:var(--qn-soft);border-radius:3px;padding:0 5px;text-decoration:none}
+
+/* phone frames */
+.phones{display:flex;gap:18px;flex-wrap:wrap}
+.phone{width:270px;flex:none;border:2px solid var(--line);border-radius:20px;background:var(--sheet);overflow:hidden}
+.notch{height:18px;display:flex;justify-content:center;align-items:center}
+.notch i{width:56px;height:5px;border-radius:999px;background:var(--line);display:block}
+.phone .pad{padding:10px;font-size:11px;color:var(--mut)}
+.tabbar{display:flex;border-top:1px solid var(--line)}
+.tabbar span{flex:1;text-align:center;padding:7px 0;font-family:ui-monospace,monospace;font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+.tabbar .on{color:var(--ink);border-top:2px solid var(--ink);margin-top:-1px}
+
+/* storyboards */
+.story{margin:26px 0;border:1px solid var(--edge);border-radius:12px;background:var(--panel);overflow:hidden;scroll-margin-top:70px}
+.strip{display:flex;align-items:stretch;overflow-x:auto;padding:18px;gap:0}
+.pnl{flex:0 0 172px;display:flex;flex-direction:column;gap:8px}
+.pnl .num{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--acc);letter-spacing:.06em}
+.mini{height:86px;border:1px solid var(--line);border-radius:6px;background:var(--sheet);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px;position:relative}
+.mini::before{content:"";width:70%;height:5px;border-radius:2px;background:var(--box);border:1px dashed var(--line)}
+.mini::after{content:"";width:46%;height:5px;border-radius:2px;background:var(--box);border:1px dashed var(--line)}
+.mini .ref{font-family:ui-monospace,monospace;font-size:10px;color:var(--acc);background:var(--acc-soft);border-radius:3px;padding:1px 7px}
+.pnl.off .mini{border-style:dashed;background:transparent}
+.pnl.off .mini .ref{color:var(--mut);background:var(--box)}
+.pnl .cap{font-size:11.5px;color:var(--mut);line-height:1.45}
+.pnl .cap b{color:var(--ink);font-weight:600}
+.pnl .cap code{font-size:10px;color:var(--acc)}
+.arr{flex:0 0 34px;display:flex;align-items:center;justify-content:center;color:var(--line);font-size:15px}
+.mini .st{position:absolute;top:6px;right:6px;font-family:ui-monospace,monospace;font-size:8.5px;border:1px solid var(--line);border-radius:999px;padding:0 6px;color:var(--mut)}
+
+/* open questions */
+.qs{counter-reset:q;margin:20px 0 0;padding:0;list-style:none}
+.qs li{counter-increment:q;background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:14px 18px 14px 58px;margin:10px 0;position:relative;scroll-margin-top:80px}
+.qs li::before{content:"Q" counter(q);position:absolute;left:16px;top:14px;
+  font-family:ui-monospace,monospace;font-size:11px;color:var(--qn);background:var(--qn-soft);border-radius:5px;padding:2px 7px}
+.qs .qq{font-weight:600;margin:0 0 4px;font-size:14.5px}
+.qs .qa{font-size:13px;color:var(--mut);margin:0;max-width:72ch}
+.qs .qa b{color:var(--ink);font-weight:600}
+footer{margin-top:70px;font-size:12.5px;color:var(--mut);border-top:1px solid var(--edge);padding-top:18px}
+</style>
+
+<nav class="topnav"><div class="in-nav">
+  <a class="brand" href="#top">IGIVER · WIREFRAMES</a>
+  <a href="#legend">Legend</a>
+  <a href="#ia">Screen map</a>
+  <a href="#admin">Admin</a>
+  <a href="#trainer">Trainer</a>
+  <a href="#placement">Placement</a>
+  <a href="#stories">Storyboards</a>
+  <a href="#questions" style="color:var(--qn)">Open questions</a>
+</div></nav>
+
+<div class="wrap" id="top">
+
+<header class="hero">
+  <p class="eyebrow">Design pack · v1 · from APP-Data-Structure-Detailed.md (28 tables)</p>
+  <h1>Wireframes &amp; storyboards for the Igiver training platform</h1>
+  <p class="lede">Low-fidelity on purpose: these fix <b>what each screen does and which schema fields it touches</b>, not colors or final layout. Every frame is annotated with its reads and writes against the data structure, and every storyboard step points at the frame it happens on.</p>
+  <ul class="decisions">
+    <li><b>Responsive web app</b> — desktop for admin, phone for trainers</li>
+    <li>Logins: <b>Admin · Trainer · Placement officer</b></li>
+    <li><b>Coordinator enters all entrance scores</b> — no panelist logins</li>
+    <li>Students, panel members, colleges: <b>no accounts</b> (matches schema)</li>
+  </ul>
+</header>
+
+<hr class="rule">
+<h2 id="legend">How to read these</h2>
+<p class="secl">Sheet codes (W-01…) are stable references — storyboards and annotations cite them. Red Q-chips link to the open-questions list at the end.</p>
+<div class="legend">
+  <div class="lg"><div class="demo"><span class="bx" style="width:90px">content</span></div>Dashed box = placeholder / content region. Size and copy are indicative only.</div>
+  <div class="lg"><div class="demo"><span class="btn">Action</span><span class="btn p">Primary</span></div>Solid outline = interactive control. Filled = the screen's primary action.</div>
+  <div class="lg"><div class="demo"><span class="bx x" style="width:64px;height:30px"></span></div>Crossed box = file upload or media (photos, PDFs, certificates).</div>
+  <div class="lg"><div class="demo"><code style="font-size:11px;color:var(--acc)">billing.rate_applied</code></div>Blue mono = a real column from the schema this UI reads or writes.</div>
+  <div class="lg"><div class="demo"><span class="qref">Q4</span></div>Red chip = something the schema can't answer — see <a href="#questions">open questions</a>.</div>
+</div>
+
+<hr class="rule">
+<h2 id="ia">Screen map<span class="cnt">3 roles · 23 screens</span></h2>
+<p class="secl">Who sees what. One responsive app; the trainer's five screens are designed phone-first since they're used standing in a classroom.</p>
+<div class="ia">
+  <div class="iacol">
+    <h3>Admin / Coordinator</h3>
+    <p class="who">Desktop. Runs everything from college signup to billing approval.</p>
+    <ul>
+      <li>Dashboard<code>W-01</code></li>
+      <li>Colleges<code>W-02</code></li>
+      <li>Batches<code>W-03</code></li>
+      <li>Entrance weights<code>W-04</code></li>
+      <li>Candidates &amp; scores<code>W-05 · W-06</code></li>
+      <li>Ranking &amp; selection<code>W-07</code></li>
+      <li>Panel sessions<code>W-08</code></li>
+      <li>Student onboarding<code>W-09</code></li>
+      <li>Curriculum builder<code>W-10</code></li>
+      <li>Subject ↔ trainer<code>W-11</code></li>
+      <li>Scheduling<code>W-12</code></li>
+      <li>Session detail<code>W-13</code></li>
+      <li>Attendance &amp; certificates<code>W-14</code></li>
+      <li>Billing<code>W-15</code></li>
+    </ul>
+  </div>
+  <div class="iacol">
+    <h3>Trainer</h3>
+    <p class="who">Phone-first. Their day, their classes, their money.</p>
+    <ul>
+      <li>My schedule<code>W-16</code></li>
+      <li>Conduct session<code>W-17</code></li>
+      <li>Take attendance<code>W-18</code></li>
+      <li>Enter scores<code>W-19</code></li>
+      <li>My invoices<code>W-20</code></li>
+    </ul>
+  </div>
+  <div class="iacol">
+    <h3>Placement officer</h3>
+    <p class="who">Desktop. Companies, interviews, offers. Restricted to the placement domain.</p>
+    <ul>
+      <li>Companies &amp; positions<code>W-21</code></li>
+      <li>Interviews<code>W-22</code></li>
+      <li>Placement tracking<code>W-23</code></li>
+    </ul>
+  </div>
+</div>
+
+<hr class="rule">
+<h2 id="admin">Admin wireframes<span class="cnt">W-01 – W-15 · desktop</span></h2>
+
+<!-- W-01 -->
+<section class="sheet" id="w01">
+  <div class="shead"><span class="code">W-01</span><span class="nm">Dashboard</span><span class="tag adm">Admin</span><span class="route">/dashboard</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / dashboard</span></div>
+      <div class="pad">
+        <div class="r">
+          <div class="sideb">
+            <div class="navi on">Dashboard</div><div class="navi">Colleges</div><div class="navi">Batches</div><div class="navi">Entrance</div><div class="navi">Curriculum</div><div class="navi">Scheduling</div><div class="navi">Attendance</div><div class="navi">Billing</div><div class="navi">Placement</div>
+          </div>
+          <div class="grow" style="display:flex;flex-direction:column;gap:8px">
+            <div class="r">
+              <div class="stat"><div class="k">Active batches</div><div class="v">4</div></div>
+              <div class="stat"><div class="k">Sessions today</div><div class="v">7</div></div>
+              <div class="stat"><div class="k">Invoices pending</div><div class="v">3</div></div>
+              <div class="stat"><div class="k">Attendance gaps</div><div class="v">2</div></div>
+            </div>
+            <div class="warn">⚠ 2 conducted sessions missing attendance rows → W-14</div>
+            <div class="r">
+              <div class="bx tl grow" style="min-height:96px">Today's sessions<br>batch · topic · trainer · slot · status</div>
+              <div class="bx tl grow" style="min-height:96px">Batches vs target hours<br>(delivered / target_hours_min–max)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Reads</h4>
+      <ul>
+        <li><span class="rw">R</span><code>batches.batch_status</code></li>
+        <li><span class="rw">R</span><code>class_session</code> (today, per batch)</li>
+        <li><span class="rw">R</span><code>billing.billing_status = 'pending_approval'</code></li>
+        <li><span class="rw">R</span> attendance completeness query (table 18, rule 4)</li>
+      </ul>
+      <h4>Notes</h4>
+      <ul><li>The two alert tiles are the spec's two watchdog queries surfaced daily, so gaps get fixed while people still remember the class.</li></ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-02 -->
+<section class="sheet" id="w02">
+  <div class="shead"><span class="code">W-02</span><span class="nm">Colleges</span><span class="tag adm">Admin</span><span class="route">/colleges</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / colleges</span></div>
+      <div class="pad">
+        <div class="r mid"><div class="in grow">Search colleges…</div><span class="btn p">+ Add college</span></div>
+        <div class="r">
+          <div class="grow">
+            <table class="tb">
+              <tr><th>College</th><th>Contact 1</th><th>Batches</th><th>Active</th></tr>
+              <tr><td>St. Mary's College</td><td class="m">Dr. Rao · 98·······</td><td class="m">2</td><td><span class="pill f">yes</span></td></tr>
+              <tr><td>Govt. Arts College</td><td class="m">Prof. Devi · 97·······</td><td class="m">1</td><td><span class="pill f">yes</span></td></tr>
+              <tr><td class="m">…</td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+            </table>
+          </div>
+          <div class="grow" style="display:flex;flex-direction:column;gap:6px">
+            <div class="lb">Edit college</div>
+            <div class="r"><div class="fld"><span class="lb">college_name *</span><div class="in"></div></div></div>
+            <div class="r"><div class="fld"><span class="lb">email *</span><div class="in"></div></div><div class="fld"><span class="lb">phone *</span><div class="in"></div></div></div>
+            <div class="fld"><span class="lb">address *</span><div class="in" style="min-height:40px"></div></div>
+            <div class="r"><div class="fld"><span class="lb">contact 1 * name / phone</span><div class="in"></div></div><div class="fld"><span class="lb">contact 2</span><div class="in"></div></div><div class="fld"><span class="lb">contact 3</span><div class="in"></div></div></div>
+            <div class="r mid"><span class="btn p">Save</span><span class="btn">Deactivate</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>colleges.*</code> — all fields, contacts capped at 3 by confirmed rule</li></ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Master–detail on one screen; a college is simple enough not to need its own page.</li>
+        <li>"Deactivate" sets <code>active=false</code> — never delete; batches reference it.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-03 -->
+<section class="sheet" id="w03">
+  <div class="shead"><span class="code">W-03</span><span class="nm">Batch — create / edit</span><span class="tag adm">Admin</span><span class="route">/batches/:id</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / batches / new</span></div>
+      <div class="pad">
+        <div class="r"><div class="fld"><span class="lb">college_id *</span><div class="in">Select college ▾</div></div><div class="fld"><span class="lb">batch_year *</span><div class="in">2026-27</div></div></div>
+        <div class="r"><div class="fld"><span class="lb">start_month *</span><div class="in">Jun ▾</div></div><div class="fld"><span class="lb">end_month *</span><div class="in">Mar ▾</div></div><div class="fld"><span class="lb">batch_status</span><div class="in">planning ▾</div></div></div>
+        <div class="r"><div class="fld"><span class="lb">target_hours_min</span><div class="in">300</div></div><div class="fld"><span class="lb">target_hours_max</span><div class="in">350</div></div><div class="fld"></div></div>
+        <div class="warn">ℹ end_month may be before start_month — batches cross year boundaries (spec, table 2)</div>
+        <div class="r mid"><span class="btn p">Save batch</span><span class="btn">Archive</span></div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>batches.*</code></li></ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Status advances planning → active → completed → archived; archived makes the batch read-only everywhere else.</li>
+        <li>No <code>end &gt; start</code> validation, per spec.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-04 -->
+<section class="sheet" id="w04">
+  <div class="shead"><span class="code">W-04</span><span class="nm">Entrance score weights</span><span class="tag adm">Admin</span><span class="route">/batches/:id/weights</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / batch 2026-27 / entrance weights</span></div>
+      <div class="pad">
+        <div class="r">
+          <div class="fld"><span class="lb">university_marks</span><div class="in">0.25</div></div>
+          <div class="fld"><span class="lb">attendance</span><div class="in">0.10</div></div>
+          <div class="fld"><span class="lb">igiver_aptitude</span><div class="in">0.20</div></div>
+          <div class="fld"><span class="lb">hod_feedback</span><div class="in">0.09</div></div>
+        </div>
+        <div class="r">
+          <div class="fld"><span class="lb">panel_1</span><div class="in">0.12</div></div>
+          <div class="fld"><span class="lb">panel_2</span><div class="in">0.12</div></div>
+          <div class="fld"><span class="lb">panel_3</span><div class="in">0.12</div></div>
+          <div class="fld"><span class="lb">effective_from *</span><div class="in">2026-05-01</div></div>
+        </div>
+        <div class="warn">Σ = 1.0000 ✓ — Save disabled until the seven weights sum to exactly 1</div>
+        <div class="r mid"><span class="btn p">Save weights</span><span class="bx plain grow tl">History: earlier weight sets listed read-only below (versioned by effective_from)</span></div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>entrance_score_weights.*</code></li></ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Live Σ indicator mirrors the DB CHECK — the form catches it before the database does.</li>
+        <li>All three panel weights always apply: panels are exactly 3 people (confirmed rule).</li>
+        <li>Editing after scoring starts creates a new row with a new <code>effective_from</code>, never edits the old one.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-05 -->
+<section class="sheet" id="w05">
+  <div class="shead"><span class="code">W-05</span><span class="nm">Candidates</span><span class="tag adm">Admin</span><span class="route">/batches/:id/candidates</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / batch 2026-27 / candidates</span></div>
+      <div class="pad">
+        <div class="r mid"><div class="in grow">Search candidates…</div><span class="btn">Import CSV</span><span class="btn p">+ Add candidate</span></div>
+        <table class="tb">
+          <tr><th>Candidate</th><th>Course</th><th>Scoring</th><th>Total</th><th></th></tr>
+          <tr><td>Ananya S.</td><td class="m">BCA</td><td><span class="pill f">3/3 panels</span></td><td>78.40</td><td><span class="btn">Open →</span></td></tr>
+          <tr><td>Vikram R.</td><td class="m">B.Com</td><td><span class="pill">1/3 panels</span></td><td class="m">—</td><td><span class="btn">Open →</span></td></tr>
+          <tr><td>Meena K.</td><td class="m">BA</td><td><span class="pill">not started</span></td><td class="m">—</td><td><span class="btn">Open →</span></td></tr>
+        </table>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Reads / writes</h4>
+      <ul>
+        <li><span class="rw">W</span><code>students.*</code> incl. parent/guardian (mandatory)</li>
+        <li><span class="rw">R</span><code>entrance_exam_scores</code> — panel completeness per row</li>
+      </ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>"3/3 panels" chip shows the outcome-guard state: no total until all three panelists are in.</li>
+        <li>Bulk import <a class="qref" href="#questions">Q1</a> — source format unconfirmed.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-06 -->
+<section class="sheet" id="w06">
+  <div class="shead"><span class="code">W-06</span><span class="nm">Score entry — one candidate</span><span class="tag adm">Admin</span><span class="route">/candidates/:id/scores</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / candidates / Ananya S. / entrance scores</span></div>
+      <div class="pad">
+        <div class="r">
+          <div class="fld"><span class="lb">yr1 marks / attendance</span><div class="r"><div class="in grow">72.5</div><div class="in grow">88</div></div></div>
+          <div class="fld"><span class="lb">yr2 marks / attendance</span><div class="r"><div class="in grow">75.0</div><div class="in grow">91</div></div></div>
+          <div class="fld"><span class="lb">aptitude</span><div class="in">81</div></div>
+          <div class="fld"><span class="lb">hod_feedback</span><div class="in">7.5</div></div>
+        </div>
+        <table class="tb">
+          <tr><th>Panelist (3 required)</th><th>Score</th><th>Feedback (optional)</th></tr>
+          <tr><td>Panel 1 · R. Iyer ▾</td><td>8.0</td><td class="m">Confident, clear logic…</td></tr>
+          <tr><td>Panel 2 · S. Menon ▾</td><td>7.5</td><td class="m">—</td></tr>
+          <tr><td class="m">Panel 3 · select ▾</td><td class="m">—</td><td class="m">—</td></tr>
+        </table>
+        <div class="r mid">
+          <div class="fld"><span class="lb">family_income (₹, &lt; 4,00,000)</span><div class="in">2,40,000</div></div>
+          <div class="stat"><div class="k">total_weighted_score</div><div class="v">— (locked)</div></div>
+          <span class="btn dis">Compute total — needs 3/3 panels</span>
+        </div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul>
+        <li><span class="rw">W</span><code>entrance_exam_scores.*</code> — coordinator enters everything (decision)</li>
+        <li><span class="rw">W</span><code>total_weighted_score</code> — computed, then stored (survives weight changes)</li>
+      </ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Partial saves allowed — panelists sit on different days. The disabled compute button <i>is</i> the schema's outcome CHECK, in UI form.</li>
+        <li>Weights used = latest set at/before evaluation date (table 5).</li>
+        <li>Feedback optional; scores are not.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-07 -->
+<section class="sheet" id="w07">
+  <div class="shead"><span class="code">W-07</span><span class="nm">Ranking &amp; selection</span><span class="tag adm">Admin</span><span class="route">/batches/:id/ranking</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / batch 2026-27 / ranking</span></div>
+      <div class="pad">
+        <div class="r mid"><div class="fld" style="max-width:170px"><span class="lb">cutoff — select top</span><div class="in">30 ▾</div></div><div class="bx plain grow tl">42 candidates fully scored · 3 incomplete (excluded until 3/3 panels)</div><span class="btn p">Confirm selection</span></div>
+        <table class="tb">
+          <tr><th>#</th><th>Candidate</th><th>Total</th><th>Income OK</th><th>Selected</th></tr>
+          <tr><td>1</td><td>Ananya S.</td><td>84.20</td><td><span class="pill f">✓</span></td><td><span class="seg"><span class="on">yes</span><span>no</span></span></td></tr>
+          <tr><td>2</td><td>Farhan A.</td><td>82.75</td><td><span class="pill f">✓</span></td><td><span class="seg"><span class="on">yes</span><span>no</span></span></td></tr>
+          <tr><td class="m">…</td><td class="m">──── cutoff line at #30 ────</td><td class="m"></td><td class="m"></td><td class="m"></td></tr>
+          <tr><td>31</td><td>Meena K.</td><td>61.10</td><td><span class="pill f">✓</span></td><td><span class="seg"><span>yes</span><span class="on">no</span></span></td></tr>
+        </table>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul>
+        <li><span class="rw">W</span><code>entrance_exam_scores.selected</code></li>
+        <li><span class="rw">W</span><code>student_selection_onboarding</code> — row created per selected student, with <code>entrance_rank</code></li>
+      </ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Cutoff pre-fills the toggles; each row can be overridden by hand <a class="qref" href="#questions">Q2</a>.</li>
+        <li>Confirm is the moment ranks freeze and onboarding records exist.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-08 -->
+<section class="sheet" id="w08">
+  <div class="shead"><span class="code">W-08</span><span class="nm">Panel sessions</span><span class="tag adm">Admin</span><span class="route">/batches/:id/panel-sessions</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / batch 2026-27 / panel sessions</span></div>
+      <div class="pad">
+        <div class="r mid"><span class="btn p">+ Schedule sitting</span><div class="bx plain grow tl">One row per panelist per day — 3 panelists on one day = 3 rows (each paid separately)</div></div>
+        <table class="tb">
+          <tr><th>Date</th><th>Panelist</th><th>Planned</th><th>Actual</th><th>Mode</th><th>Status</th><th>Seen</th></tr>
+          <tr><td>12 May</td><td>R. Iyer</td><td class="m">09:00–13:00</td><td>09:10–13:20</td><td><span class="pill f">Offline</span></td><td><span class="pill f">conducted</span></td><td class="m">11</td></tr>
+          <tr><td>12 May</td><td>S. Menon</td><td class="m">09:00–13:00</td><td>09:10–13:05</td><td><span class="pill f">Offline</span></td><td><span class="pill f">conducted</span></td><td class="m">11</td></tr>
+          <tr><td>14 May</td><td>K. Das</td><td class="m">09:00–12:00</td><td class="m">—</td><td><span class="pill">Online</span></td><td><span class="pill">pending</span></td><td class="m">—</td></tr>
+        </table>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>panel_sessions.*</code> — actual times are what billing pays on</li></ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>This screen exists so panelists can be paid per hour at all — scores (W-06) don't drive payment; sitting time does.</li>
+        <li>Only <code>conducted</code> rows become billable lines in W-15.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-09 -->
+<section class="sheet" id="w09">
+  <div class="shead"><span class="code">W-09</span><span class="nm">Student onboarding</span><span class="tag adm">Admin</span><span class="route">/onboarding/:id</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / onboarding / Ananya S. (rank 1)</span></div>
+      <div class="pad">
+        <div class="r">
+          <div class="fld"><span class="lb">track</span><div class="seg"><span class="on">Zoho</span><span>nonZoho</span></div></div>
+          <div class="fld"><span class="lb">course_status</span><div class="in">in_progress ▾</div></div>
+          <div class="fld"><span class="lb">certificate_status</span><div class="in">not_issued (locked — 80% gate)</div></div>
+        </div>
+        <div class="r">
+          <div class="fld"><span class="lb">deposit_amount (₹)</span><div class="in">5,000</div></div>
+          <div class="fld"><span class="lb">deposit_received_date</span><div class="in">2026-06-02</div></div>
+          <div class="fld"><span class="lb">receipt PDF</span><div class="bx x" style="height:28px"></div></div>
+        </div>
+        <div class="r">
+          <div class="fld"><span class="lb">income certificate (&lt; ₹4 lakh, signed)</span><div class="bx x" style="height:34px"></div></div>
+          <div class="fld"><span class="lb">deposit_refund_date</span><div class="in m">— (on completion)</div></div>
+        </div>
+        <div class="r mid"><span class="btn p">Save</span><span class="btn">Mark dropout…</span></div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>student_selection_onboarding.*</code></li></ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>"Mark dropout…" opens a small dialog demanding <code>course_status_description</code> and <code>dropout_date</code> together — the date is what stops attendance checks expecting the student afterwards.</li>
+        <li>Deposit amount: fixed or per-student? <a class="qref" href="#questions">Q3</a></li>
+        <li>Certificate field stays locked here; issuing happens on W-14 where the 80% evidence is on screen.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-10 -->
+<section class="sheet" id="w10">
+  <div class="shead"><span class="code">W-10</span><span class="nm">Curriculum builder</span><span class="tag adm">Admin</span><span class="route">/curriculum</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / curriculum</span></div>
+      <div class="pad">
+        <div class="r">
+          <div class="grow" style="display:flex;flex-direction:column;gap:6px">
+            <div class="lb">Subjects</div>
+            <div class="bx solid tl" style="border-style:solid">JavaScript</div>
+            <div class="bx tl">HTML</div><div class="bx tl">Zoho Creator</div>
+            <span class="btn">+ Subject</span>
+          </div>
+          <div class="grow" style="display:flex;flex-direction:column;gap:6px">
+            <div class="lb">Modules · JavaScript</div>
+            <div class="bx solid tl" style="border-style:solid">JS Syntax · 12h · ⋮⋮</div>
+            <div class="bx tl">DOM · 10h · ⋮⋮</div>
+            <span class="btn">+ Module</span>
+          </div>
+          <div class="grow" style="display:flex;flex-direction:column;gap:6px">
+            <div class="lb">Topics · JS Syntax</div>
+            <div class="bx tl">JS Statements · 1.5h · ⋮⋮</div>
+            <div class="bx tl">JS Comments · 1.0h · ⋮⋮</div>
+            <span class="btn">+ Topic</span>
+            <div class="warn">Σ topics 11.5h vs allocated 12h</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul>
+        <li><span class="rw">W</span><code>subjects.*</code> <code>modules.*</code> <code>topics.*</code></li>
+        <li><span class="rw">W</span><code>sort_order</code> via drag handles (⋮⋮)</li>
+      </ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Three-pane miller columns mirror the Subject → Module → Topic hierarchy exactly.</li>
+        <li>Topic duration input constrained to 1.00–2.00h (schema CHECK).</li>
+        <li>Does <code>track</code> (Zoho/nonZoho) filter which subjects a batch gets? Nothing links them today <a class="qref" href="#questions">Q4</a>.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-11 -->
+<section class="sheet" id="w11">
+  <div class="shead"><span class="code">W-11</span><span class="nm">Subject ↔ trainer assignment</span><span class="tag adm">Admin</span><span class="route">/batches/:id/trainers</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / batch 2026-27 / trainer assignment</span></div>
+      <div class="pad">
+        <table class="tb">
+          <tr><th>Subject \ Trainer</th><th>Priya N.</th><th>Arun T.</th><th>Divya L.</th></tr>
+          <tr><td>JavaScript</td><td><span class="pill f">✓ assigned</span></td><td><span class="pill f">✓ assigned</span></td><td class="m">—</td></tr>
+          <tr><td>HTML</td><td><span class="pill f">✓ assigned</span></td><td class="m">—</td><td class="m">—</td></tr>
+          <tr><td>Zoho Creator</td><td class="m">—</td><td class="m">—</td><td><span class="pill f">✓ assigned</span></td></tr>
+        </table>
+        <div class="bx plain tl">Derived trainer roster for this batch: Priya N., Arun T., Divya L. — read-only, computed from the checkmarks above (no separate trainer↔batch table)</div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>subject_trainer_mapping</code> — one row per checked cell (subject, trainer, batch)</li></ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Matrix shows the two confirmed rules at once: several trainers per subject (JavaScript column-span) and several subjects per trainer (Priya row-span).</li>
+        <li>The roster strip is the spec's <code>SELECT DISTINCT trainer_id, batch_id</code> view, visualized.</li>
+        <li>Consequence (accepted): a trainer can't join a batch with no subject picked.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-12 -->
+<section class="sheet" id="w12">
+  <div class="shead"><span class="code">W-12</span><span class="nm">Scheduling — slots &amp; mapping</span><span class="tag adm">Admin</span><span class="route">/batches/:id/schedule</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / batch 2026-27 / schedule / week of 9 Jun</span></div>
+      <div class="pad">
+        <div class="r mid"><span class="btn">‹</span><div class="bx plain grow">Mon 9 — Sat 14 Jun</div><span class="btn">›</span><span class="btn p">+ Declare slot</span></div>
+        <div class="r">
+          <div class="grow"><div class="lb">Mon 9</div><div class="bx tl" style="min-height:52px">09–11 · Lab<br><span class="pill f">mapped</span> JS Statements · Priya</div></div>
+          <div class="grow"><div class="lb">Tue 10</div><div class="bx tl" style="min-height:52px">09–11 · Classroom<br><span class="pill">available</span></div></div>
+          <div class="grow"><div class="lb">Wed 11</div><div class="bx tl" style="min-height:52px">14–16 · Lab<br><span class="pill f">consumed</span> ✓ conducted</div></div>
+          <div class="grow"><div class="lb">Thu 12</div><div class="bx plain" style="min-height:52px">—</div></div>
+        </div>
+        <div class="bx tl solid" style="border-style:solid">Map session onto Tue 09–11 (Classroom):&nbsp; topic ▾ (from this batch's assigned subjects) · trainer ▾ (must teach that subject here) · mode: <span class="pill f">Online Classroom</span> <span class="pill f">Offline Classroom</span> <span class="pill">Lab modes hidden — slot is Classroom</span> &nbsp;<span class="btn p">Map</span></div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Reads / writes</h4>
+      <ul>
+        <li><span class="rw">W</span><code>availability.*</code> — declare / edit slots</li>
+        <li><span class="rw">W</span><code>class_session</code> — created on Map, <code>mapped_by</code> = current user</li>
+        <li><span class="rw">R</span><code>subject_trainer_mapping</code> — filters both pickers</li>
+      </ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>The drawer enforces the spec's four-table validation by construction: you can only pick trainer+topic pairs that are legal.</li>
+        <li><code>class_type</code> constrains offered modes — a Classroom slot can't host a Lab session.</li>
+        <li>Slots entered by admin from college communication <a class="qref" href="#questions">Q5</a>.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-13 -->
+<section class="sheet" id="w13">
+  <div class="shead"><span class="code">W-13</span><span class="nm">Session detail (admin)</span><span class="tag adm">Admin</span><span class="route">/sessions/:id</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / sessions / Mon 9 Jun · JS Statements · Priya N.</span></div>
+      <div class="pad">
+        <div class="r">
+          <div class="stat"><div class="k">status</div><div class="v" style="font-size:13px">conducted</div></div>
+          <div class="stat"><div class="k">actual</div><div class="v" style="font-size:13px">09:05–11:00</div></div>
+          <div class="stat"><div class="k">mode</div><div class="v" style="font-size:13px">Offline Lab</div></div>
+          <div class="stat"><div class="k">attendance</div><div class="v" style="font-size:13px">28/30 ✓</div></div>
+        </div>
+        <div class="r">
+          <div class="fld"><span class="lb">trainer_remarks</span><div class="in m" style="min-height:36px">Covered statements + started comments…</div></div>
+          <div class="fld"><span class="lb">admin_remarks</span><div class="in" style="min-height:36px"></div></div>
+        </div>
+        <div class="r mid"><span class="pill">reschedule_required: no</span><span class="btn">Mark not_conducted…</span><span class="btn">View attendance → W-18 data</span></div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Reads / writes</h4>
+      <ul>
+        <li><span class="rw">R</span><code>class_session.*</code> — trainer fills most of it from W-17</li>
+        <li><span class="rw">W</span><code>admin_remarks</code>, status overrides</li>
+      </ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Trainer records actuals; admin can override <a class="qref" href="#questions">Q6</a>.</li>
+        <li>Billable hours = actual times shown here, not the slot's planned window.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-14 -->
+<section class="sheet" id="w14">
+  <div class="shead"><span class="code">W-14</span><span class="nm">Attendance &amp; certificates</span><span class="tag adm">Admin</span><span class="route">/batches/:id/attendance</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / batch 2026-27 / attendance &amp; certification</span></div>
+      <div class="pad">
+        <div class="warn">⚠ Completeness: session Wed 11 Jun has 26/30 students marked — 4 missing (rule 4, table 18)</div>
+        <table class="tb">
+          <tr><th>Student</th><th>P+L</th><th>Countable</th><th>%</th><th>≥ 80%</th><th>Certificate</th></tr>
+          <tr><td>Ananya S.</td><td>52</td><td>60</td><td>86.7</td><td><span class="pill f">yes</span></td><td><span class="btn">Issue…</span></td></tr>
+          <tr><td>Farhan A.</td><td>45</td><td>60</td><td>75.0</td><td><span class="pill">no</span></td><td><span class="btn dis">Issue</span></td></tr>
+          <tr><td>Riya M. <span class="pill">dropout 12 Aug</span></td><td class="m">—</td><td class="m">—</td><td class="m">—</td><td class="m">n/a</td><td class="m">n/a</td></tr>
+        </table>
+        <div class="bx plain tl">% = (present + late) ÷ (all marks except excused) · fixed 80% floor, all batches · Issue writes certificate_status + certificate_id (template picker)</div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Reads / writes</h4>
+      <ul>
+        <li><span class="rw">R</span> completeness + eligibility queries (table 18, rules 4–6)</li>
+        <li><span class="rw">W</span><code>student_selection_onboarding.certificate_status / certificate_id</code></li>
+      </ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Issue button is <b>disabled by the 80% gate</b> — the UI can't do what the spec forbids.</li>
+        <li>Cert generation from <code>template_url</code>: automated or recorded-only? <a class="qref" href="#questions">Q7</a></li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-15 -->
+<section class="sheet" id="w15">
+  <div class="shead"><span class="code">W-15</span><span class="nm">Billing — invoice detail</span><span class="tag adm">Admin</span><span class="route">/billing/:id</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / billing / INV-2026-0042 · Priya N. · 1–30 Jun</span></div>
+      <div class="pad">
+        <div class="r mid">
+          <span class="pill f">payee: trainer</span><span class="pill">status: draft</span>
+          <div class="grow"></div>
+          <span class="btn">Regenerate lines</span><span class="btn p">Submit for approval</span>
+        </div>
+        <table class="tb">
+          <tr><th>Type</th><th>Session</th><th>Hours</th><th>Rate (snap)</th><th>Amount ₹</th></tr>
+          <tr><td>teaching_hours</td><td class="m">9 Jun · JS Statements</td><td>1.92</td><td>800.00</td><td>1,536.00</td></tr>
+          <tr><td>visit_allowance</td><td class="m">9 Jun (Offline Lab)</td><td class="m">—</td><td>300.00</td><td>300.00</td></tr>
+          <tr><td>teaching_hours</td><td class="m">11 Jun · JS Comments</td><td>2.00</td><td>800.00</td><td>1,600.00</td></tr>
+          <tr><td>adjustment</td><td class="m">— note required</td><td class="m">—</td><td class="m">—</td><td>−200.00</td></tr>
+        </table>
+        <div class="warn">subtotal 3,236.00 = Σ line items ✓ (reconciliation blocks approval when ≠)</div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Reads / writes</h4>
+      <ul>
+        <li><span class="rw">W</span><code>billing.*</code> — exactly one payee (trainer or panel member)</li>
+        <li><span class="rw">W</span><code>billing_line_items.*</code> — pulled from conducted sessions in period; <code>rate_applied</code> snapshotted</li>
+      </ul>
+      <h4>Notes</h4>
+      <ul>
+        <li>Lines are read-only once past draft; corrections = new adjustment line (spec rule 9).</li>
+        <li>Same screen serves panel invoices — session column shows panel sittings, type <code>panel_hours</code>.</li>
+        <li>Billing cadence assumed monthly <a class="qref" href="#questions">Q8</a>.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
+
+<hr class="rule">
+<h2 id="trainer">Trainer wireframes<span class="cnt">W-16 – W-20 · phone-first</span></h2>
+<p class="secl">Same web app on a phone. The attendance screen is the one that must work one-handed in a noisy classroom — big targets, one decision per row.</p>
+
+<div class="phones">
+  <!-- W-16 -->
+  <div class="phone" id="w16">
+    <div class="notch"><i></i></div>
+    <div class="pad">
+      <div class="lb" style="font-size:10px">W-16 · MY SCHEDULE · /me/schedule</div>
+      <div class="bx plain tl">Today · Mon 9 Jun</div>
+      <div class="bx tl solid" style="border-style:solid;min-height:44px">09:00 · JS Statements<br>St. Mary's · Offline Lab · <span class="pill">pending</span></div>
+      <div class="bx tl" style="min-height:44px">14:00 · JS Comments<br>Govt. Arts · Online Classroom</div>
+      <div class="bx plain tl">Tomorrow ▾</div>
+    </div>
+    <div class="tabbar"><span class="on">Schedule</span><span>Scores</span><span>Invoices</span></div>
+  </div>
+  <!-- W-17 -->
+  <div class="phone" id="w17">
+    <div class="notch"><i></i></div>
+    <div class="pad">
+      <div class="lb" style="font-size:10px">W-17 · CONDUCT SESSION</div>
+      <div class="bx plain tl">JS Statements · 09:00–11:00 slot</div>
+      <div class="r"><div class="fld"><span class="lb">actual start</span><div class="in">09:05</div></div><div class="fld"><span class="lb">actual end</span><div class="in">11:00</div></div></div>
+      <div class="fld"><span class="lb">actual_class_mode</span><div class="in">Offline Lab ▾</div></div>
+      <div class="fld"><span class="lb">trainer_remarks</span><div class="in" style="min-height:34px"></div></div>
+      <div class="r"><span class="btn p grow" style="flex:1">Conducted → attendance</span></div>
+      <div class="r"><span class="btn grow" style="flex:1">Not conducted…</span></div>
+    </div>
+    <div class="tabbar"><span class="on">Schedule</span><span>Scores</span><span>Invoices</span></div>
+  </div>
+  <!-- W-18 -->
+  <div class="phone" id="w18">
+    <div class="notch"><i></i></div>
+    <div class="pad">
+      <div class="lb" style="font-size:10px">W-18 · TAKE ATTENDANCE · 0 of 30 marked</div>
+      <div class="r mid"><div class="bx plain grow tl">Ananya S.</div><span class="seg"><span class="on">P</span><span>A</span><span>L</span><span>E</span></span></div>
+      <div class="r mid"><div class="bx plain grow tl">Farhan A.</div><span class="seg"><span>P</span><span class="on">A</span><span>L</span><span>E</span></span></div>
+      <div class="r mid"><div class="bx plain grow tl">Vikram R.</div><span class="seg"><span>P</span><span>A</span><span class="on">L</span><span>E</span></span></div>
+      <div class="bx plain tl" style="font-size:10px">E (excused) asks for a remark · roster = enrolled, not dropped out before today</div>
+      <div class="r"><span class="btn dis grow" style="flex:1">Submit register — 27 unmarked</span></div>
+    </div>
+    <div class="tabbar"><span class="on">Schedule</span><span>Scores</span><span>Invoices</span></div>
+  </div>
+  <!-- W-19 -->
+  <div class="phone" id="w19">
+    <div class="notch"><i></i></div>
+    <div class="pad">
+      <div class="lb" style="font-size:10px">W-19 · ENTER SCORES</div>
+      <div class="fld"><span class="lb">module</span><div class="in">JS Syntax ▾ (my subjects)</div></div>
+      <div class="fld"><span class="lb">evaluation_name</span><div class="in">JS Module Test 1</div></div>
+      <div class="r"><div class="fld"><span class="lb">max_score</span><div class="in">50</div></div><div class="fld"></div></div>
+      <div class="r mid"><div class="bx plain grow tl">Ananya S.</div><div class="in" style="width:56px">42</div></div>
+      <div class="r mid"><div class="bx plain grow tl">Farhan A.</div><div class="in" style="width:56px">38</div></div>
+      <div class="r"><span class="btn p grow" style="flex:1">Save all</span></div>
+    </div>
+    <div class="tabbar"><span>Schedule</span><span class="on">Scores</span><span>Invoices</span></div>
+  </div>
+  <!-- W-20 -->
+  <div class="phone" id="w20">
+    <div class="notch"><i></i></div>
+    <div class="pad">
+      <div class="lb" style="font-size:10px">W-20 · MY INVOICES (read-only)</div>
+      <div class="bx tl solid" style="border-style:solid;min-height:40px">INV-2026-0042 · June<br>₹3,236 · <span class="pill">pending_approval</span></div>
+      <div class="bx tl" style="min-height:40px">INV-2026-0031 · May<br>₹12,480 · <span class="pill f">paid</span></div>
+      <div class="bx plain tl" style="font-size:10px">Tap → line items: session, hours, rate snapshot. Disputes reference exact sessions.</div>
+    </div>
+    <div class="tabbar"><span>Schedule</span><span>Scores</span><span class="on">Invoices</span></div>
+  </div>
+</div>
+
+<div class="sheet" style="margin-top:22px"><div class="sbody" style="grid-template-columns:1fr">
+  <aside class="ann">
+    <h4>Trainer screens — reads / writes</h4>
+    <ul>
+      <li><span class="rw">R</span> W-16: <code>class_session</code> ⋈ <code>availability</code>, own <code>trainer_id</code> only</li>
+      <li><span class="rw">W</span> W-17: <code>actual_start/end_time, actual_class_mode, class_status, trainer_remarks</code></li>
+      <li><span class="rw">W</span> W-18: <code>session_attendance</code> — one row per student; <code>marked_by</code> auto; submit flips <code>attendance_register_taken</code>. Submit disabled until every rostered student is marked — the mandatory-attendance rule made physical.</li>
+      <li><span class="rw">W</span> W-19: <code>student_evaluation</code> — <code>entered_by</code> auto; module picker limited to the trainer's mapped subjects</li>
+      <li><span class="rw">R</span> W-20: <code>billing + billing_line_items</code>, own invoices only</li>
+    </ul>
+  </aside>
+</div></div>
+
+<hr class="rule">
+<h2 id="placement">Placement wireframes<span class="cnt">W-21 – W-23 · desktop</span></h2>
+
+<!-- W-21 -->
+<section class="sheet" id="w21">
+  <div class="shead"><span class="code">W-21</span><span class="nm">Companies &amp; positions</span><span class="tag">Placement</span><span class="route">/companies</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / placement / companies</span></div>
+      <div class="pad">
+        <div class="r">
+          <div class="grow">
+            <div class="r mid"><div class="in grow">Search…</div><span class="btn p">+ Company</span></div>
+            <table class="tb" style="margin-top:8px">
+              <tr><th>Company</th><th>Contact</th><th>Open roles</th></tr>
+              <tr><td>Zylker Tech</td><td class="m">HR · Priya</td><td class="m">2</td></tr>
+              <tr><td>Acme Soft</td><td class="m">HR · Ravi</td><td class="m">1</td></tr>
+            </table>
+          </div>
+          <div class="grow" style="display:flex;flex-direction:column;gap:6px">
+            <div class="lb">Positions · Zylker Tech</div>
+            <div class="bx tl">Junior Zoho Developer · <span class="pill f">live</span></div>
+            <div class="bx tl">Support Engineer · <span class="pill">closed</span></div>
+            <span class="btn">+ Position</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>companies.*</code> · <code>company_positions.*</code></li></ul>
+      <h4>Notes</h4>
+      <ul><li>Placements target a <b>position</b>, not a company — that's why the right pane exists.</li></ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-22 -->
+<section class="sheet" id="w22">
+  <div class="shead"><span class="code">W-22</span><span class="nm">Interviews</span><span class="tag">Placement</span><span class="route">/interviews</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / placement / interviews</span></div>
+      <div class="pad">
+        <div class="r mid"><span class="btn p">+ Schedule interview</span><div class="bx plain grow tl">student ▾ · company ▾ · date · time — scheduled_by is recorded automatically</div></div>
+        <table class="tb">
+          <tr><th>Student</th><th>Company</th><th>Date</th><th>Result</th><th>Notes</th></tr>
+          <tr><td>Ananya S.</td><td class="m">Zylker Tech</td><td class="m">2 Feb</td><td><span class="seg"><span>hold</span><span class="on">next_round</span><span>cleared</span><span>failed</span><span>pairing</span></span></td><td class="m">strong basics…</td></tr>
+          <tr><td>Ananya S.</td><td class="m">Zylker Tech</td><td class="m">9 Feb</td><td><span class="seg"><span>hold</span><span>next_round</span><span class="on">cleared</span><span>failed</span><span>pairing</span></span></td><td class="m">round 2 ✓</td></tr>
+        </table>
+        <div class="bx plain tl">next_round → the "+ Schedule" bar pre-fills the same student + company for the following sitting</div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>student_interview.*</code> — one row per interview occurrence; rounds are separate rows</li></ul>
+      <h4>Notes</h4>
+      <ul><li>Which students appear in the picker — all in-progress, or only completed? <a class="qref" href="#questions">Q9</a></li></ul>
+    </aside>
+  </div>
+</section>
+
+<!-- W-23 -->
+<section class="sheet" id="w23">
+  <div class="shead"><span class="code">W-23</span><span class="nm">Placement tracking</span><span class="tag">Placement</span><span class="route">/placements/:id</span></div>
+  <div class="sbody">
+    <div class="wf">
+      <div class="tbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="crumb">igiver / placement / Ananya S. → Junior Zoho Developer</span></div>
+      <div class="pad">
+        <div class="r">
+          <div class="fld"><span class="lb">placement_status</span><div class="in">placed ▾</div></div>
+          <div class="fld"><span class="lb">offer_date</span><div class="in">2027-02-15</div></div>
+          <div class="fld"><span class="lb">starting_salary (₹/yr)</span><div class="in">3,60,000</div></div>
+        </div>
+        <div class="r">
+          <div class="fld"><span class="lb">offer letter</span><div class="bx x" style="height:30px"></div></div>
+          <div class="fld"><span class="lb">signed acknowledgement</span><div class="bx x" style="height:30px"></div></div>
+        </div>
+        <div class="fld"><span class="lb">placement_notes</span><div class="in" style="min-height:34px"></div></div>
+        <div class="r mid"><span class="btn p">Save</span></div>
+      </div>
+    </div>
+    <aside class="ann">
+      <h4>Writes</h4>
+      <ul><li><span class="rw">W</span><code>placement_tracking.*</code></li></ul>
+      <h4>Notes</h4>
+      <ul><li><code>starting_salary</code> is the programme's headline outcome metric — it feeds the dashboard eventually.</li></ul>
+    </aside>
+  </div>
+</section>
+
+<hr class="rule">
+<h2 id="stories">Storyboards<span class="cnt">10 flows</span></h2>
+<p class="secl">Each strip is one end-to-end flow. Solid panels happen inside the app (labeled with the wireframe they use); dashed panels happen in the real world. Strips scroll sideways.</p>
+
+<!-- S1 -->
+<div class="story" id="s1">
+  <div class="shead"><span class="code">S-1</span><span class="nm">Set up a college and its batch</span><span class="route">Admin</span></div>
+  <div class="strip">
+    <div class="pnl off"><div class="num">1</div><div class="mini"><span class="ref">offline</span><span class="st">real world</span></div><p class="cap">College agrees to partner; shares contacts and an academic-year window.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-02</span></div><p class="cap">Admin adds the college with up to 3 contact people.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">3</div><div class="mini"><span class="ref">W-03</span></div><p class="cap">Creates the batch: year, months, 300–350 target hours. Status <code>planning</code>.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-04</span></div><p class="cap">Sets entrance weights — Save refuses until the 7 weights sum to exactly 1.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">5</div><div class="mini"><span class="ref">W-01</span></div><p class="cap">Batch appears on the dashboard, ready for candidates.</p></div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="story" id="s2">
+  <div class="shead"><span class="code">S-2</span><span class="nm">Entrance: candidates → selection</span><span class="route">Admin · the long one</span></div>
+  <div class="strip">
+    <div class="pnl"><div class="num">1</div><div class="mini"><span class="ref">W-05</span></div><p class="cap">Candidates registered (or imported) with parent/guardian details.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-08</span></div><p class="cap">Panel sittings scheduled — one row per panelist per day.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl off"><div class="num">3</div><div class="mini"><span class="ref">offline</span><span class="st">real world</span></div><p class="cap">Interviews happen. Panelists score on paper; aptitude test runs.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-08</span></div><p class="cap">Sittings marked <code>conducted</code> with actual times — this is what panelists get paid on.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">5</div><div class="mini"><span class="ref">W-06</span></div><p class="cap">Coordinator enters marks, aptitude, HOD, and all 3 panel scores per candidate.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">6</div><div class="mini"><span class="ref">W-06</span></div><p class="cap">At 3/3 panels the compute unlocks; <code>total_weighted_score</code> is stored.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">7</div><div class="mini"><span class="ref">W-07</span></div><p class="cap">Ranked list; cutoff pre-selects top N; manual overrides allowed.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">8</div><div class="mini"><span class="ref">W-07</span></div><p class="cap">Confirm freezes <code>entrance_rank</code> and creates onboarding records.</p></div>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="story" id="s3">
+  <div class="shead"><span class="code">S-3</span><span class="nm">Onboard a selected student</span><span class="route">Admin</span></div>
+  <div class="strip">
+    <div class="pnl off"><div class="num">1</div><div class="mini"><span class="ref">offline</span><span class="st">real world</span></div><p class="cap">Family notified; deposit collected; signed income certificate obtained (&lt; ₹4 lakh).</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-09</span></div><p class="cap">Track chosen: <code>Zoho</code> or <code>nonZoho</code>.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">3</div><div class="mini"><span class="ref">W-09</span></div><p class="cap">Deposit amount + date recorded; receipt PDF uploaded.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-09</span></div><p class="cap">Income certificate scan uploaded.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">5</div><div class="mini"><span class="ref">W-09</span></div><p class="cap">Status <code>in_progress</code> — student is now on every attendance roster.</p></div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="story" id="s4">
+  <div class="shead"><span class="code">S-4</span><span class="nm">Build curriculum, assign trainers</span><span class="route">Admin</span></div>
+  <div class="strip">
+    <div class="pnl"><div class="num">1</div><div class="mini"><span class="ref">W-10</span></div><p class="cap">Subjects created (canonical — one "JavaScript" for everyone).</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-10</span></div><p class="cap">Modules with allocated hours; topics of 1–2h each, drag-ordered.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">3</div><div class="mini"><span class="ref">W-11</span></div><p class="cap">Matrix ticked per batch — two trainers can share JavaScript.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-11</span></div><p class="cap">Batch roster derives automatically from the ticks — nothing else to maintain.</p></div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="story" id="s5">
+  <div class="shead"><span class="code">S-5</span><span class="nm">Deliver a class — happy path</span><span class="route">Admin + Trainer</span></div>
+  <div class="strip">
+    <div class="pnl off"><div class="num">1</div><div class="mini"><span class="ref">offline</span><span class="st">real world</span></div><p class="cap">College tells admin when a room and students are free.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-12</span></div><p class="cap">Slot declared: date, times, <code>Lab</code>/<code>Classroom</code>.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">3</div><div class="mini"><span class="ref">W-12</span></div><p class="cap">Topic + trainer mapped on. Pickers only offer legal pairs; slot flips to <code>mapped</code>.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-16</span></div><p class="cap">Session appears on the trainer's phone.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">5</div><div class="mini"><span class="ref">W-17</span></div><p class="cap">Trainer teaches, records actual times + actual mode, taps Conducted.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">6</div><div class="mini"><span class="ref">W-18</span></div><p class="cap">Register: P/A/L/E per student. Submit refuses until all 30 are marked.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">7</div><div class="mini"><span class="ref">W-01</span></div><p class="cap">Slot <code>consumed</code>; hours count toward the 300–350 target; no gap alert fires.</p></div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="story" id="s6">
+  <div class="shead"><span class="code">S-6</span><span class="nm">Class doesn't happen → reschedule</span><span class="route">Trainer + Admin</span></div>
+  <div class="strip">
+    <div class="pnl off"><div class="num">1</div><div class="mini"><span class="ref">offline</span><span class="st">real world</span></div><p class="cap">College strike / power cut / trainer ill — no class.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-17</span></div><p class="cap">Trainer taps Not conducted with a remark; <code>reschedule_required</code> set.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">3</div><div class="mini"><span class="ref">W-01</span></div><p class="cap">Session surfaces in the admin's reschedule queue. No attendance, no billing.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-12</span></div><p class="cap">Same topic mapped onto a fresh slot — a new session row; the old one stays as history.</p></div>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="story" id="s7">
+  <div class="shead"><span class="code">S-7</span><span class="nm">Monthly billing — trainer (panel variant noted)</span><span class="route">Admin</span></div>
+  <div class="strip">
+    <div class="pnl"><div class="num">1</div><div class="mini"><span class="ref">W-15</span></div><p class="cap">Draft invoice generated for payee + period.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-15</span></div><p class="cap">Lines auto-pull every <b>conducted, unbilled</b> session in the period; rate snapshotted per line; offline sessions add visit allowance.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">3</div><div class="mini"><span class="ref">W-15</span></div><p class="cap">Reconciliation strip: subtotal must equal Σ lines, or approval is blocked.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-15</span></div><p class="cap">Submitted → approved. Lines freeze; fixes from here are adjustment lines.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl off"><div class="num">5</div><div class="mini"><span class="ref">offline</span><span class="st">real world</span></div><p class="cap">Bank transfer happens; TDS handled outside.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">6</div><div class="mini"><span class="ref">W-15</span></div><p class="cap">Marked <code>paid</code>. Trainer sees it in W-20. Panel invoices: same flow, sittings from W-08 instead of classes.</p></div>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="story" id="s8">
+  <div class="shead"><span class="code">S-8</span><span class="nm">Course end → certificate + deposit refund</span><span class="route">Admin</span></div>
+  <div class="strip">
+    <div class="pnl"><div class="num">1</div><div class="mini"><span class="ref">W-14</span></div><p class="cap">Completeness check green — every conducted session fully marked.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-14</span></div><p class="cap">Per-student %: (P+L) ÷ (marks except E), against the fixed 80% floor.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">3</div><div class="mini"><span class="ref">W-14</span></div><p class="cap">Issue enabled only at ≥ 80% — below it the button physically won't.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-14</span></div><p class="cap">Template picked; <code>certificate_status = issued</code>; course marked completed.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">5</div><div class="mini"><span class="ref">W-09</span></div><p class="cap">Deposit refunded; <code>deposit_refund_date</code> recorded.</p></div>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="story" id="s9">
+  <div class="shead"><span class="code">S-9</span><span class="nm">Placement: interview rounds → placed</span><span class="route">Placement officer</span></div>
+  <div class="strip">
+    <div class="pnl"><div class="num">1</div><div class="mini"><span class="ref">W-21</span></div><p class="cap">Company added with its open positions.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-22</span></div><p class="cap">Round 1 scheduled: student × company × date.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl off"><div class="num">3</div><div class="mini"><span class="ref">offline</span><span class="st">real world</span></div><p class="cap">Interview happens at the company or online.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-22</span></div><p class="cap">Result recorded. <code>next_round</code> loops back to step 2 as a new row.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">5</div><div class="mini"><span class="ref">W-23</span></div><p class="cap">Cleared → tracked against the <b>position</b>: offer date, salary, letter + signed acknowledgement.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">6</div><div class="mini"><span class="ref">W-23</span></div><p class="cap"><code>placement_status = placed</code> — the programme's outcome metric.</p></div>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="story" id="s10">
+  <div class="shead"><span class="code">S-10</span><span class="nm">Dropout</span><span class="route">Admin</span></div>
+  <div class="strip">
+    <div class="pnl off"><div class="num">1</div><div class="mini"><span class="ref">offline</span><span class="st">real world</span></div><p class="cap">Student gets a job / leaves the country / stops coming.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">2</div><div class="mini"><span class="ref">W-09</span></div><p class="cap">Mark dropout: reason (required) + <code>dropout_date</code> (required together).</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">3</div><div class="mini"><span class="ref">W-18</span></div><p class="cap">From that date the student vanishes from registers — no false "missing" alerts.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">4</div><div class="mini"><span class="ref">W-14</span></div><p class="cap">Excluded from eligibility; row shows the dropout chip instead of a %.</p></div>
+    <div class="arr">→</div>
+    <div class="pnl"><div class="num">5</div><div class="mini"><span class="ref">W-09</span></div><p class="cap">Deposit decision recorded <a class="qref" href="#questions">Q10</a> — refund on dropout is unspecified.</p></div>
+  </div>
+</div>
+
+<hr class="rule">
+<h2 id="questions">Open questions<span class="cnt">10 — none block wireframing; all block build</span></h2>
+<p class="secl">Things neither the schema nor our decisions so far can answer. Each has the default the wireframes currently assume — correct any that are wrong.</p>
+<ol class="qs">
+  <li><p class="qq">How do candidates arrive in the system?</p><p class="qa">W-05 assumes both single-entry and a CSV import from the college. If colleges send spreadsheets, the import needs a defined column format. <b>Assumed: CSV import exists.</b></p></li>
+  <li><p class="qq">Is selection strictly top-N by rank, or can the coordinator override?</p><p class="qa">W-07 draws a cutoff that pre-selects, with per-row override toggles. If policy is strict rank order, the toggles go away. <b>Assumed: override allowed.</b></p></li>
+  <li><p class="qq">Is the deposit a fixed standard amount?</p><p class="qa">The schema stores it per student, which permits variation. If it's always the same figure, W-09 pre-fills it and the field locks. <b>Assumed: standard amount, editable.</b></p></li>
+  <li><p class="qq">Does the Zoho / nonZoho track change what's taught?</p><p class="qa">Nothing in the schema links <code>track</code> to subjects. If Zoho-track students get different subjects, a link table is needed and W-12's topic picker must filter by track. <b>Assumed: track is a label only, for now.</b></p></li>
+  <li><p class="qq">Who declares availability slots?</p><p class="qa">Colleges have no login, so W-12 assumes the college phones/emails and an admin types it in. Fine at current scale; a college portal is a future option. <b>Assumed: admin enters.</b></p></li>
+  <li><p class="qq">Who has the final say on a session's actuals?</p><p class="qa">W-17 lets the trainer record actual times and status; W-13 lets an admin override. If billing disputes matter, overrides should be logged. <b>Assumed: trainer records, admin may override.</b></p></li>
+  <li><p class="qq">Are certificates generated by the system or outside it?</p><p class="qa">The schema stores a <code>template_url</code>, which suggests generation, but no output field exists for the finished certificate PDF. If the system generates, add an <code>issued_certificate_url</code>. <b>Assumed: recorded in-system, generated outside for v1.</b></p></li>
+  <li><p class="qq">What's the billing period convention?</p><p class="qa">W-15 assumes calendar-month invoices per payee. The schema allows arbitrary periods. <b>Assumed: monthly.</b></p></li>
+  <li><p class="qq">When does a student become eligible for placement?</p><p class="qa">W-22's student picker needs a rule: only <code>completed</code> students, or also <code>in_progress</code> near course end? Interviews often start before courses finish. <b>Assumed: in_progress and completed both appear.</b></p></li>
+  <li><p class="qq">What happens to the deposit on dropout?</p><p class="qa">The spec ties refund to completion; dropout refund policy is unstated. S-10 ends on this decision. <b>Assumed: case-by-case, recorded in notes — but a policy would be better.</b></p></li>
+</ol>
+
+<footer>
+  Igiver training platform · wireframes &amp; storyboards v1 · derived from <span class="mono">APP-Data-Structure-Detailed.md</span> (28 tables) · sheet codes W-01–W-23, storyboards S-1–S-10 are stable references for review comments.
+</footer>
+
+</div>
