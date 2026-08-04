@@ -19,12 +19,12 @@ process meaning and impose no ordering.
 | [Institutions & Cohorts](#institutions--cohorts) | 1. Colleges · 2. Batches |
 | [Candidates & Entrance](#candidates--entrance) | 3. Students · 4. Panel Members · 5. Entrance Score Weights · 6. Entrance Exam Scores · 7. Panel Sessions |
 | [Enrollment & Progress](#enrollment--progress) | 8. Student Selection & Onboarding · 9. Student Evaluation · 10. Certificates |
-| [Trainers & Curriculum](#trainers--curriculum) | 11. Trainers · 12. Subjects · 13. Subject Trainer Mapping · 14. Modules · 15. Topics · 16. Trainer Batch Mapping |
-| [Scheduling & Delivery](#scheduling--delivery) | 17. Availability · 18. Class Session · 19. Session Attendance · 20. Assessment |
-| [Access Control](#access-control) | 21. Roles · 22. Users |
-| [Placement](#placement) | 23. Companies · 24. Company Positions · 25. Student Interview · 26. Placement Tracking |
-| [Payments](#payments) | 27. Billing · 28. Billing Line Items |
-| [System](#system) | 29. Notification Templates |
+| [Trainers & Curriculum](#trainers--curriculum) | 11. Trainers · 12. Subjects · 13. Subject Trainer Mapping · 14. Modules · 15. Topics |
+| [Scheduling & Delivery](#scheduling--delivery) | 16. Availability · 17. Class Session · 18. Session Attendance · 19. Assessment |
+| [Access Control](#access-control) | 20. Roles · 21. Users |
+| [Placement](#placement) | 22. Companies · 23. Company Positions · 24. Student Interview · 25. Placement Tracking |
+| [Payments](#payments) | 26. Billing · 27. Billing Line Items |
+| [System](#system) | 28. Notification Templates |
 
 ---
 
@@ -120,7 +120,7 @@ ultimately selected — selection outcome lives in table 8.
 
 **Purpose:** External interviewers who score candidates during entrance evaluation. Paid on a
 per-hour basis exactly as trainers are — hours recorded in Panel Sessions (table 7), invoiced
-through Billing (table 27).
+through Billing (table 26).
 
 | Field | Data Type / Constraints | Description |
 |---|---|---|
@@ -194,7 +194,7 @@ plus the computed weighted total that drives ranking and selection.
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
-> **Two different attendances.** `year1_attendance` and `year2_attendance` are the candidate's attendance *at their college*, self-reported at entrance and used for selection. In-course attendance on the training programme is a separate thing entirely, recorded per session in table 19.
+> **Two different attendances.** `year1_attendance` and `year2_attendance` are the candidate's attendance *at their college*, self-reported at entrance and used for selection. In-course attendance on the training programme is a separate thing entirely, recorded per session in table 18.
 
 > **Scoring vs. payment.** The panel columns here record *who scored a candidate and what they gave*. They deliberately do **not** drive payment — a panelist is paid for time sitting on a panel, not per candidate scored. Payable hours come from Panel Sessions (table 7).
 
@@ -248,7 +248,7 @@ roster against which session attendance is checked for completeness.
 | course_status | Text, One of ('in_progress','completed','dropout') | Progress through the programme. |
 | course_status_description | Text | Reason, required when `course_status = 'dropout'` — e.g. got a job, left the country. |
 | dropout_date | Date | Date the student left, when `course_status = 'dropout'`. Needed so attendance completeness checks stop expecting rows for sessions after departure. |
-| certificate_status | Text, One of ('not_issued','issued') | Whether the completion certificate has been issued. **Must not move to `issued` unless the student's attendance is at least 80%** — see rules 6 and 7 under table 19. |
+| certificate_status | Text, One of ('not_issued','issued') | Whether the completion certificate has been issued. **Must not move to `issued` unless the student's attendance is at least 80%** — see rules 6 and 7 under table 18. |
 | certificate_id | UUID (FK → certificates.id) | The certificate template used. Null until issued. |
 | active | Boolean, Default TRUE | Soft-delete flag. |
 | created_at | Timestamptz, Default now() | Record creation time. |
@@ -336,7 +336,8 @@ table 13.
 
 **Purpose:** Assigns trainers to subjects **within a specific batch**. Because it is keyed on all
 three, one subject can be taught by several trainers in the same batch, and the same trainer can
-teach different subjects across different batches.
+teach different subjects across different batches. **This is the single source of truth for who
+works on which batch** — see the derivation note below.
 
 | Field | Data Type / Constraints | Description |
 |---|---|---|
@@ -350,6 +351,33 @@ teach different subjects across different batches.
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
 > **Recommended constraint:** unique on `(subject_id, trainer_id, batch_id)` when active, preventing duplicate assignments while still allowing multiple trainers per subject and multiple subjects per trainer.
+
+### Deriving trainer ↔ batch
+
+There is deliberately **no separate trainer-to-batch table**. Every row here already states that a
+trainer works on a batch — that fact is implied by saying they teach a subject in it — so storing it
+again in a second table would duplicate one fact in two places that could disagree. Read it instead:
+
+```sql
+SELECT DISTINCT trainer_id, batch_id
+FROM subject_trainer_mapping
+WHERE active;
+```
+
+A trainer teaching three subjects in one batch appears three times here and once in that result;
+`DISTINCT` does the collapsing. Wrap it in a view if it is queried often:
+
+```sql
+CREATE VIEW trainer_batch AS
+SELECT DISTINCT trainer_id, batch_id
+FROM subject_trainer_mapping
+WHERE active;
+```
+
+**Consequence to be aware of:** a trainer cannot be attached to a batch before their subjects are
+decided, because `subject_id` is mandatory here. If that intermediate state is ever needed, do not
+reintroduce a second mapping table — add a nullable `subject_id` to this one, or model the intent as
+a status on the row.
 
 ## 14. Modules Table
 
@@ -385,28 +413,11 @@ single class session actually delivers.
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
-## 16. Trainer Batch Mapping Table
-
-**Purpose:** Coarse-grained assignment of a trainer to a batch, independent of subject. Useful for
-assigning a trainer before the subject split is decided.
-
-| Field | Data Type / Constraints | Description |
-|---|---|---|
-| id | UUID (Primary Key) | Unique assignment identifier. |
-| trainer_id | UUID (FK → trainers.id) | Assigned trainer. |
-| batch_id | UUID (FK → batches.id) | Batch assigned to. |
-| assigned_at | Timestamptz, Default now() | When the assignment was made. Distinct from `created_at`, which is row-insert time — these differ when backfilling. |
-| active | Boolean, Default TRUE | Whether the assignment currently stands. |
-| created_at | Timestamptz, Default now() | Record creation time. |
-| updated_at | Timestamptz, Default now() | Last modification time. |
-
-> **Overlap with table 13.** Any row here is implied by a Subject Trainer Mapping row for the same trainer and batch, so the two can drift. Either keep this table as the deliberate coarse assignment and derive nothing from it, or drop it and read trainer↔batch as `SELECT DISTINCT trainer_id, batch_id FROM subject_trainer_mapping WHERE active`. Retained here because it may be populated before subjects are allocated.
-
 ---
 
 # Scheduling & Delivery
 
-## 17. Availability Table
+## 16. Availability Table
 
 **Purpose:** Bookable time slots declared per batch — when the college has students and a room
 free. Class sessions are mapped onto these slots.
@@ -425,7 +436,7 @@ free. Class sessions are mapped onto these slots.
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
-## 18. Class Session Table
+## 17. Class Session Table
 
 **Purpose:** A single class — planned, then delivered. Ties together batch, trainer, topic, and
 time slot, and records what actually happened versus what was planned. **The source of truth for
@@ -443,7 +454,7 @@ billable teaching hours.**
 | actual_start_time | Time | Real start time. May differ from the slot's `start_time`. |
 | actual_end_time | Time | Real end time. Together with `actual_start_time` this yields the true taught duration that billing must use. |
 | actual_class_mode | Text, One of ('Online Lab','Online Classroom','Offline Lab','Offline Classroom') | Mode actually used. A planned-offline session delivered online earns no visit allowance — this is the field that decides it. |
-| attendance_register_taken | Boolean | Confirmation that the register was completed for this session. Should be `TRUE` if and only if a full set of Session Attendance rows exists for the batch's enrolled students — see the completeness check in table 19. Kept as an explicit sign-off, not as a substitute for the rows. |
+| attendance_register_taken | Boolean | Confirmation that the register was completed for this session. Should be `TRUE` if and only if a full set of Session Attendance rows exists for the batch's enrolled students — see the completeness check in table 18. Kept as an explicit sign-off, not as a substitute for the rows. |
 | trainer_remarks | Text | Trainer's notes on the session — coverage, student engagement, problems. |
 | admin_remarks | Text | Administrative notes, e.g. why a session was not conducted. |
 | reschedule_required | Boolean | Flags that this session needs re-running, typically when `class_status = 'not_conducted'`. |
@@ -452,7 +463,9 @@ billable teaching hours.**
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
-## 19. Session Attendance Table
+> **Validation:** the assigned trainer should hold an active Subject Trainer Mapping row for this batch and the subject that owns `topic_id`. This spans four tables and cannot be expressed as a foreign key — enforce it in the application.
+
+## 18. Session Attendance Table
 
 **Purpose:** Per-student attendance for each class session — one row per enrolled student per
 conducted session. Attendance is **mandatory**: a conducted session missing rows for any enrolled
@@ -464,7 +477,7 @@ certification eligibility, dropout detection, and college reporting.
 | id | UUID (Primary Key) | Unique attendance record identifier. |
 | class_session_id | UUID (FK → class_session.id, Not Null) | Session being registered. |
 | student_id | UUID (FK → students.id, Not Null) | Student whose attendance this records. Must be enrolled in the session's batch. |
-| attendance_status | Text, One of ('present','absent','late','excused'), Not Null | Outcome for this student. `present` = attended in full; `late` = attended but arrived after start; `absent` = did not attend, unexcused; `excused` = did not attend, with prior approval (medical, exam clash). The `excused` / `absent` split matters because policy usually treats them differently in the eligibility percentage. |
+| attendance_status | Text, One of ('present','absent','late','excused'), Not Null | Outcome for this student. `present` = attended in full; `late` = attended but arrived after start; `absent` = did not attend, unexcused; `excused` = did not attend, with prior approval (medical, exam clash). The `excused` / `absent` split matters because policy treats them differently in the eligibility percentage. |
 | minutes_attended | SmallInt | Actual minutes present, where partial attendance is tracked. Most useful for online sessions where join and leave times are logged automatically. Null when only the status is recorded. |
 | remarks | Text | Reason for absence, note on lateness, or supporting detail for an `excused` mark. |
 | marked_by | UUID (FK → users.id, Not Null) | User who took the register — normally the delivering trainer. The audit trail when a student disputes a mark. |
@@ -606,7 +619,7 @@ WHERE so.active
 8. **Attendance is not billing.** A trainer is paid for delivering the session regardless of how many
    students turned up. Nothing in this table feeds Billing.
 
-## 20. Assessment Table
+## 19. Assessment Table
 
 **Purpose:** Assessment definitions at module level — the exam paper and its metadata. Per-student
 results are recorded in Student Evaluation (table 9).
@@ -629,7 +642,7 @@ results are recorded in Student Evaluation (table 9).
 
 # Access Control
 
-## 21. Roles Table
+## 20. Roles Table
 
 **Purpose:** Role definitions for access control, e.g. Admin, Trainer, Placement Officer.
 
@@ -642,7 +655,7 @@ results are recorded in Student Evaluation (table 9).
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
-## 22. Users Table
+## 21. Users Table
 
 **Purpose:** Application login accounts. Every actor who signs in has a row here; trainers
 additionally have a Trainers row linked by `trainers.user_id`.
@@ -664,7 +677,7 @@ additionally have a Trainers row linked by `trainers.user_id`.
 
 # Placement
 
-## 23. Companies Table
+## 22. Companies Table
 
 **Purpose:** Hiring partners that interview and recruit graduating students.
 
@@ -679,7 +692,7 @@ additionally have a Trainers row linked by `trainers.user_id`.
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
-## 24. Company Positions Table
+## 23. Company Positions Table
 
 **Purpose:** Specific job openings at a hiring partner. Students are placed against a position, not
 merely against a company — this is what lets one company run several distinct roles.
@@ -694,7 +707,7 @@ merely against a company — this is what lets one company run several distinct 
 | created_at | Timestamptz, Default now() | Record creation time. |
 | updated_at | Timestamptz, Default now() | Last modification time. |
 
-## 25. Student Interview Table
+## 24. Student Interview Table
 
 **Purpose:** Log of interview events between a student and a company, including multi-round
 progress. One row per interview occurrence.
@@ -715,7 +728,7 @@ progress. One row per interview occurrence.
 
 > **Not to be confused with Panel Sessions (table 7).** This table covers *employer* interviews at placement time. Table 7 covers *entrance* interviews by internal panel members, and is the one that drives payment.
 
-## 26. Placement Tracking Table
+## 25. Placement Tracking Table
 
 **Purpose:** Outcome of a student's candidacy against a specific position — offer, salary, and
 supporting documents. The final record of programme success.
@@ -743,10 +756,10 @@ Trainers and panel members are paid identically — an hourly rate against recor
 visit allowance when they attend in person. Both therefore share one invoicing path: a Billing header
 naming the payee, and Billing Line Items carrying the hours.
 
-## 27. Billing Table
+## 26. Billing Table
 
 **Purpose:** Invoice **header** for one payee — either a trainer or a panel member — over one
-billing period. Holds totals and approval state; the hours behind those totals live in table 28.
+billing period. Holds totals and approval state; the hours behind those totals live in table 27.
 
 | Field | Data Type / Constraints | Description |
 |---|---|---|
@@ -771,7 +784,7 @@ billing period. Holds totals and approval state; the hours behind those totals l
 > nullable FKs are used rather than a `payee_type`/`payee_id` pair so the database still enforces
 > referential integrity — a polymorphic reference cannot.
 
-## 28. Billing Line Items Table
+## 27. Billing Line Items Table
 
 **Purpose:** One row per billable item on an invoice, each tied to the specific conducted session
 that earned it — a class session for trainers, a panel session for panel members. This is what makes
@@ -834,7 +847,7 @@ an invoice can be shown exactly which sittings it covers.
 
 # System
 
-## 29. Notification Templates Table
+## 28. Notification Templates Table
 
 **Purpose:** Message templates for automated communication, keyed by the event that triggers them
 and the channel they go out on.
@@ -864,7 +877,6 @@ colleges ──┬─< batches ──┬─< availability ──< class_session 
            │             ├─< entrance_score_weights│
            │             ├─< entrance_exam_scores  │
            │             ├─< panel_sessions >── panel_members
-           │             ├─< trainer_batch_mapping ┘
            │             ├─< subject_trainer_mapping >── trainers, subjects
            │             └─< student_selection_onboarding >── certificates
            │
@@ -881,6 +893,9 @@ billing >── trainers  (exactly one payee)
    └──< billing_line_items ──┬─> class_session   (trainer invoices)
                              └─> panel_sessions  (panel invoices)
 ```
+
+**Trainer ↔ batch is derived, not stored** — `SELECT DISTINCT trainer_id, batch_id FROM
+subject_trainer_mapping WHERE active`. See the derivation note under table 13.
 
 **The billing chain, end to end:**
 
@@ -912,20 +927,25 @@ student_selection_onboarding (who is enrolled in the batch)
 
 ## Resolved in this revision
 
+18. **Trainer Batch Mapping dropped.** The table stored `(trainer_id, batch_id)`, both of which
+    Subject Trainer Mapping already carries — so it duplicated one fact across two tables that could
+    disagree, with no mechanism to keep them aligned. Trainer↔batch is now derived with
+    `SELECT DISTINCT trainer_id, batch_id FROM subject_trainer_mapping WHERE active`, optionally
+    wrapped in a `trainer_batch` view. Tables after it renumbered; the schema is now 28 tables.
+
+## Earlier revisions
+
 17. **Attendance policy fixed.** The certification floor is **80%, identical for every batch** — a
     business rule held as an application constant, not a column. `present` and `late` both count as
     attended; `excused` is excluded from the denominator. Added the eligibility query, the rule
     barring `certificate_status = 'issued'` below the floor, and a compliance query listing
     certificates already issued in breach of it.
-
-## Earlier revisions
-
 16. **Per-student attendance added.** `class_session.attendance_register_taken` recorded only *that*
-    a register was taken, never who was present. Added **Session Attendance (table 19)**, one row per
-    student per conducted session, with a unique constraint on `(class_session_id, student_id)`, a
-    completeness query for the mandatory rule, and an attendance-percentage query for certification
-    eligibility. Added `dropout_date` to table 8 so completeness checks stop expecting rows for
-    students who had already left.
+    a register was taken, never who was present. Added **Session Attendance**, one row per student
+    per conducted session, with a unique constraint on `(class_session_id, student_id)`, a
+    completeness query for the mandatory rule, and an attendance-percentage query. Added
+    `dropout_date` to table 8 so completeness checks stop expecting rows for students who had already
+    left.
 15. **Three-panelist cap confirmed as intended**, along with the three college-contact columns.
 14. **Phase groupings removed.** Tables are organised by functional domain.
 13. **A subject can be taught by multiple trainers within one batch.** Removed `subjects.trainer_id`
@@ -960,9 +980,6 @@ student_selection_onboarding (who is enrolled in the batch)
 
 # Open Items
 
-**Trainer Batch Mapping partially overlaps Subject Trainer Mapping.** Table 16 is derivable from
-table 13 and the two can drift. Worth deciding whether to keep both — see the note under table 16.
-
 **Entrance weights assume all three panelists score.** If a candidate is seen by only one or two, the
 weights no longer sum to 1 and the total score is understated. Needs either a redistribution rule or
 normalization by the weights actually used.
@@ -983,3 +1000,8 @@ the register can affect eligibility without a second signature. Accepted for thi
 Should it need tightening later, the change is additive and requires no migration of existing rows:
 add `excused_approved_by UUID (FK → users.id)` and `excused_evidence_url Text` to Session
 Attendance, both null except on `excused` rows.
+
+**Trainers cannot be attached to a batch before subjects are allocated.** A consequence of deriving
+trainer↔batch from Subject Trainer Mapping, where `subject_id` is mandatory. Accepted because no
+current workflow depends on that intermediate state. If one emerges, make `subject_id` nullable on
+that table rather than reintroducing a second mapping table.
