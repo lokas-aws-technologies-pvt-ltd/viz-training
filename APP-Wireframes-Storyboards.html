@@ -168,6 +168,27 @@ hr.rule{border:0;border-top:1px solid var(--edge);margin:56px 0 0}
 .qs .qa{font-size:13px;color:var(--mut);margin:0;max-width:72ch}
 .qs .qa b{color:var(--ink);font-weight:600}
 footer{margin-top:70px;font-size:12.5px;color:var(--mut);border-top:1px solid var(--edge);padding-top:18px}
+
+/* ---------- print ---------- */
+@page{size:A4;margin:11mm 10mm}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  :root{ /* force light tokens regardless of OS theme */
+    --bg:#FFFFFF; --panel:#FDFDFC; --sheet:#F7F8F9; --box:#EBEEF0;
+    --ink:#212930; --mut:#6B7883; --line:#A9B4BC; --edge:#DCE2E6;
+    --acc:#2E5E9E; --acc-soft:#E3EBF5; --qn:#B3452E; --qn-soft:#F6E7E2;
+  }
+  .topnav{display:none}
+  .wrap{max-width:none;padding:0 2mm 10mm}
+  header.hero{padding-top:6mm}
+  h2{margin-top:34px;break-after:avoid}
+  hr.rule{margin:26px 0 0}
+  .sheet,.story,.phone,.iacol,.lg,.qs li{break-inside:avoid}
+  .strip{flex-wrap:wrap;overflow-x:visible;row-gap:16px}
+  .legend,.ia{break-inside:avoid}
+  a{text-decoration:none}
+  .sbody{grid-template-columns:1fr} /* stack annotations under frames on paper */
+}
 </style>
 
 <nav class="topnav"><div class="in-nav">
