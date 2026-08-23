@@ -1,0 +1,659 @@
+<title>Igiver in Zoho Creator — Build Briefing</title>
+<style>
+:root{
+  --paper:#F2F4F1; --card:#FFFFFF; --sunk:#E8EDEA;
+  --ink:#16211F; --mut:#5E6E69; --line:#C4D0CB;
+  --pine:#1B6455; --pine-soft:#DDEBE6;
+  --amber:#A2660D; --amber-soft:#F6EBD8;
+  --red:#9B3A26; --red-soft:#F6E3DD;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#121816; --card:#1A2220; --sunk:#141B19;
+  --ink:#E3E9E6; --mut:#93A49F; --line:#35433F;
+  --pine:#63C3AB; --pine-soft:#1B342E;
+  --amber:#DFAA55; --amber-soft:#382C19;
+  --red:#E08D74; --red-soft:#3A241D;
+}}
+:root[data-theme="dark"]{
+  --paper:#121816; --card:#1A2220; --sunk:#141B19;
+  --ink:#E3E9E6; --mut:#93A49F; --line:#35433F;
+  --pine:#63C3AB; --pine-soft:#1B342E;
+  --amber:#DFAA55; --amber-soft:#382C19;
+  --red:#E08D74; --red-soft:#3A241D;
+}
+:root[data-theme="light"]{
+  --paper:#F2F4F1; --card:#FFFFFF; --sunk:#E8EDEA;
+  --ink:#16211F; --mut:#5E6E69; --line:#C4D0CB;
+  --pine:#1B6455; --pine-soft:#DDEBE6;
+  --amber:#A2660D; --amber-soft:#F6EBD8;
+  --red:#9B3A26; --red-soft:#F6E3DD;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.mono,code{font-family:ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace}
+button:focus-visible{outline:2px solid var(--pine);outline-offset:3px}
+
+.deck{min-height:100vh;display:flex;flex-direction:column}
+.slide{display:none;flex:1;padding:clamp(22px,3.6vw,50px) clamp(20px,5vw,72px) 84px;
+  flex-direction:column;justify-content:center;max-width:1180px;margin:0 auto;width:100%}
+.slide.on{display:flex}
+.kick{font-family:ui-monospace,monospace;font-size:clamp(11px,1.1vw,13px);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--pine);margin:0 0 13px}
+h1{font-family:Georgia,serif;font-size:clamp(29px,5vw,58px);line-height:1.06;margin:0 0 16px;
+  font-weight:400;letter-spacing:-.015em;text-wrap:balance}
+h2{font-family:Georgia,serif;font-size:clamp(23px,3.4vw,40px);line-height:1.13;margin:0 0 8px;
+  font-weight:400;letter-spacing:-.01em;text-wrap:balance}
+.sub{font-size:clamp(14px,1.6vw,20px);color:var(--mut);margin:0 0 24px;max-width:62ch;line-height:1.45}
+.sub b{color:var(--ink);font-weight:600}
+p.note{font-size:clamp(12.5px,1.25vw,15.5px);color:var(--mut);max-width:68ch;margin:16px 0 0;line-height:1.55}
+p.note b{color:var(--ink)}
+
+.bar{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;gap:14px;
+  padding:0 clamp(16px,4vw,40px);background:var(--paper);border-top:1px solid var(--line);z-index:20}
+.bar .lbl{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--mut);letter-spacing:.05em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .sp{flex:1}
+.nb{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:7px;
+  width:38px;height:34px;font-size:15px;cursor:pointer;line-height:1}
+.nb:hover{border-color:var(--pine);color:var(--pine)}
+.nb:disabled{opacity:.35;cursor:default}
+.cnt{font-family:ui-monospace,monospace;font-size:12.5px;font-variant-numeric:tabular-nums;min-width:58px;text-align:center}
+.prog{position:fixed;left:0;bottom:56px;height:2px;background:var(--pine);z-index:21;transition:width .18s}
+@media (prefers-reduced-motion:reduce){.prog{transition:none}}
+
+.cards{display:grid;gap:13px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(162px,1fr))}
+.c{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:clamp(13px,1.6vw,19px)}
+.c h3{margin:0 0 6px;font-size:clamp(14.5px,1.55vw,17.5px)}
+.c p{margin:0;font-size:clamp(12.5px,1.2vw,14.5px);color:var(--mut);line-height:1.5}
+.c p+p{margin-top:8px}
+.c code{font-size:.88em;color:var(--pine)}
+.c .top{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--pine);margin:0 0 8px}
+.c.hl{border-color:var(--pine);background:var(--pine-soft)}
+.c.hl p{color:var(--ink)}
+.c.warn{border-color:var(--amber);background:var(--amber-soft)}
+.c.warn .top{color:var(--amber)}
+.c.warn p{color:var(--ink)}
+.c.stop{border-color:var(--red);background:var(--red-soft)}
+.c.stop .top{color:var(--red)}
+.c.stop p{color:var(--ink)}
+
+.chain{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:11px}
+.node{flex:1;min-width:115px;background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:11px 9px;text-align:center;display:flex;flex-direction:column;gap:4px;justify-content:center}
+.node .t{font-size:clamp(12px,1.25vw,14.5px);font-weight:600;line-height:1.25}
+.node .d{font-size:clamp(10px,1vw,11.5px);color:var(--mut);line-height:1.35}
+.node.acc{border-color:var(--pine);background:var(--pine-soft)}
+.node.amb{border-color:var(--amber);background:var(--amber-soft)}
+.tick{flex:0 0 24px;display:flex;align-items:center;justify-content:center;color:var(--line);font-size:16px}
+
+/* two-column compare */
+.ba{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(265px,1fr))}
+.ba .lbl{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 8px}
+.money{font-family:ui-monospace,monospace;font-size:clamp(15px,2vw,21px);font-variant-numeric:tabular-nums;
+  margin:8px 0;font-weight:600}
+.bad{color:var(--amber)} .good{color:var(--pine)}
+
+/* translation rows */
+.tr{display:flex;flex-direction:column;gap:8px}
+.trow{display:grid;grid-template-columns:1fr 26px 1fr;gap:10px;align-items:center}
+@media (max-width:640px){.trow{grid-template-columns:1fr}}
+.tl{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 13px;
+  font-size:clamp(12.5px,1.3vw,15px)}
+.tm{text-align:center;color:var(--mut);font-family:ui-monospace,monospace;font-size:13px}
+.trr{background:var(--pine-soft);border:1px solid var(--pine);border-radius:8px;padding:8px 13px;
+  font-size:clamp(12.5px,1.3vw,15px)}
+.trr code{color:var(--pine);font-weight:600}
+
+/* form group grid */
+.grp{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:11px 12px}
+.grp .n{font-family:ui-monospace,monospace;font-size:9.5px;color:var(--pine);letter-spacing:.08em}
+.grp h4{margin:3px 0 6px;font-size:clamp(12.5px,1.3vw,15px)}
+.grp ul{margin:0;padding:0;list-style:none;font-size:clamp(10px,1.05vw,12px);color:var(--mut);line-height:1.65}
+.grp li.sf{color:var(--amber);font-weight:600}
+.grp li.free{color:var(--pine);text-decoration:line-through;opacity:.75}
+
+/* code block */
+.code{background:var(--sunk);border:1px solid var(--line);border-radius:9px;padding:12px 14px;
+  font-family:ui-monospace,monospace;font-size:clamp(11px,1.15vw,13.5px);line-height:1.65;
+  overflow-x:auto;white-space:pre;color:var(--ink)}
+.code .cm{color:var(--mut)}
+.code .kw{color:var(--pine);font-weight:600}
+.code .st{color:var(--amber)}
+
+.stats{display:flex;gap:11px;flex-wrap:wrap}
+.st2{flex:1;min-width:112px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.st2 .v{font-family:Georgia,serif;font-size:clamp(22px,3vw,36px);line-height:1;font-variant-numeric:tabular-nums}
+.st2 .k{font-size:clamp(10.5px,1.05vw,12.5px);color:var(--mut);margin-top:5px;line-height:1.4}
+
+.roles{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.role .who{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--pine);margin:0 0 4px}
+.role ul{margin:8px 0 0;padding:0 0 0 16px;font-size:clamp(11.5px,1.15vw,13.5px);color:var(--mut);line-height:1.6}
+
+.qlist{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(248px,1fr))}
+.q{background:var(--amber-soft);border:1px solid var(--amber);border-radius:10px;padding:11px 14px}
+.q .qn{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--amber);letter-spacing:.08em}
+.q p{margin:4px 0 0;font-size:clamp(11.5px,1.15vw,13.5px);line-height:1.45;color:var(--ink)}
+.kbd{font-family:ui-monospace,monospace;font-size:11px;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:2px 7px;background:var(--card)}
+
+@page{size:A4 landscape;margin:10mm}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  :root{--paper:#fff;--card:#fff;--ink:#16211F;--mut:#5E6E69;--line:#C4D0CB;
+        --pine:#1B6455;--pine-soft:#DDEBE6;--amber:#A2660D;--amber-soft:#F6EBD8;
+        --red:#9B3A26;--red-soft:#F6E3DD;--sunk:#F2F4F1}
+  .bar,.prog{display:none}
+  .slide{display:flex!important;break-after:page;padding:0 0 8mm;min-height:0;justify-content:flex-start}
+  .slide:last-child{break-after:auto}
+}
+</style>
+
+<div class="deck">
+
+<!-- 1 -->
+<section class="slide on" data-sec="Start here">
+  <p class="kick">Build briefing · Igiver training platform · Zoho Creator</p>
+  <h1>What we're building —<br>and how it becomes a Creator app</h1>
+  <p class="sub">The programme, the data behind it, the rules you'll have to enforce yourself, and the order to build in. <b>No prior database knowledge assumed</b> — but by the end you'll know why the design looks the way it does.</p>
+  <div class="stats">
+    <div class="st2"><div class="v">~24</div><div class="k">Creator forms</div></div>
+    <div class="st2"><div class="v">2</div><div class="k">subforms</div></div>
+    <div class="st2"><div class="v">2</div><div class="k">permission sets</div></div>
+    <div class="st2"><div class="v">23</div><div class="k">screens designed</div></div>
+    <div class="st2"><div class="v">1</div><div class="k">app, one codebase</div></div>
+  </div>
+  <p class="note">Navigate with <span class="kbd">←</span> <span class="kbd">→</span> or the buttons below.</p>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-sec="The programme">
+  <p class="kick">01 · The idea in one sentence</p>
+  <h2>We run a free training programme that takes students from college into jobs.</h2>
+  <p class="sub">Colleges send candidates. We interview and pick the best. We train them for about a year. If they attend enough, they get certified. Then we help them get hired. <b>Every form you build serves some part of that.</b></p>
+  <div class="cards g3">
+    <div class="c"><p class="top">Who sends students</p><h3>Colleges</h3><p>Partner institutions. Classes run on their campus; they give us candidates.</p></div>
+    <div class="c"><p class="top">Who we serve</p><h3>Students</h3><p>From families under ₹4 lakh a year. They pay a refundable deposit, nothing more.</p></div>
+    <div class="c"><p class="top">Who teaches</p><h3>Trainers</h3><p>Paid per hour taught. JavaScript, HTML, CSS, Zoho Creator and more.</p></div>
+    <div class="c"><p class="top">Who selects</p><h3>Panel members</h3><p>External interviewers who score candidates. Also paid per hour.</p></div>
+    <div class="c"><p class="top">Who hires</p><h3>Companies</h3><p>Employers who interview our graduates and make offers.</p></div>
+    <div class="c hl"><p class="top">And us</p><h3>Coordinators</h3><p>Staff who run all of it — and the main users of the app you're about to build.</p></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-sec="The programme">
+  <p class="kick">02 · The journey, end to end</p>
+  <h2>One student's path through the system</h2>
+  <p class="sub">Every form and report sits somewhere on this line. When you get lost in the detail, come back to it.</p>
+  <div class="chain">
+    <div class="node"><span class="t">College signs up</span><span class="d">Partner agreed, batch created</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Students apply</span><span class="d">Candidates registered</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Entrance</span><span class="d">Marks, aptitude, 3 interviews</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Selected</span><span class="d">Ranked, top N enrolled, deposit paid</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Trained</span><span class="d">~300 hours of classes over a year</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Certified</span><span class="d">If attendance ≥ 80%</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Placed</span><span class="d">Interviews, offer, job</span></div>
+  </div>
+  <p class="note"><b>Running alongside the whole time:</b> trainers and panel members record hours and get invoiced monthly. That's a second track through the same app, and it's where mistakes cost real money.</p>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-sec="The programme">
+  <p class="kick">03 · Who logs in</p>
+  <h2>One app. Two very different logins.</h2>
+  <p class="sub">Students, colleges and panel members get <b>no login at all</b> — this is an internal tool. Admins and trainers share the app but see almost nothing in common.</p>
+  <div class="roles">
+    <div class="c role"><p class="who">Permission set A · Desktop</p><h3>Admin / Coordinator</h3><p>Runs everything. 14 of the 23 screens.</p>
+      <ul><li>Colleges, batches, candidates</li><li>Entrance scoring and selection</li><li>Curriculum and timetable</li><li>Certificates and billing</li></ul></div>
+    <div class="c role"><p class="who">Permission set B · Creator mobile app</p><h3>Trainer</h3><p>Used standing in a classroom. 5 screens.</p>
+      <ul><li>My schedule today</li><li>Start / end a class</li><li>Take attendance</li><li>Enter test scores</li><li>See my own invoices</li></ul></div>
+    <div class="c role"><p class="who">Permission set C · Desktop</p><h3>Placement officer</h3><p>Only the job-hunting part. 3 screens.</p>
+      <ul><li>Companies and open roles</li><li>Interview rounds</li><li>Offers and salaries</li></ul></div>
+  </div>
+  <p class="note"><b>Say this out loud now, because it shapes every report you build:</b> a trainer must never load another trainer's sessions or invoices. In Creator that's a criteria filter on the report, not something you can bolt on later.</p>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">04 · Turning a story into forms</p>
+  <h2>Every important noun becomes a form</h2>
+  <p class="sub">That's genuinely the whole trick. Read the story back, underline the nouns, and each one gets a form with fields for the facts you need about it.</p>
+  <div class="tr">
+    <div class="trow"><div class="tl">"St. Mary's College"</div><div class="tm">→</div><div class="trr">a record in <code>Colleges</code></div></div>
+    <div class="trow"><div class="tl">"The 2026–27 group"</div><div class="tm">→</div><div class="trr">a record in <code>Batches</code></div></div>
+    <div class="trow"><div class="tl">"Ananya, a candidate"</div><div class="tm">→</div><div class="trr">a record in <code>Students</code></div></div>
+    <div class="trow"><div class="tl">"Monday 9am JavaScript class"</div><div class="tm">→</div><div class="trr">a record in <code>Class_Session</code></div></div>
+    <div class="trow"><div class="tl">"Ananya was present"</div><div class="tm">→</div><div class="trr">a row in the <code>Attendance</code> subform</div></div>
+    <div class="trow"><div class="tl">"June invoice for Priya"</div><div class="tm">→</div><div class="trr">a record in <code>Billing</code></div></div>
+  </div>
+  <p class="note">Notice the last three. <b>Events are nouns too</b> — "a class happened", "someone was present", "an invoice was raised". Beginners spot people and places, then miss the events. <b>Most of our forms are events.</b></p>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">05 · Reading the spec document</p>
+  <h2>The spec is written in database words. Here's your translation.</h2>
+  <p class="sub">The design doc says "table", "column", "foreign key". You'll be building forms and fields. Same ideas, different vocabulary — keep this slide handy while reading it.</p>
+  <div class="tr">
+    <div class="trow"><div class="tl"><b>Table</b> — <code class="mono">colleges</code></div><div class="tm">→</div><div class="trr"><b>Form</b> — Colleges</div></div>
+    <div class="trow"><div class="tl"><b>Row</b> / record</div><div class="tm">→</div><div class="trr"><b>Record</b> — one submission</div></div>
+    <div class="trow"><div class="tl"><b>Column</b> — <code class="mono">college_name Text</code></div><div class="tm">→</div><div class="trr"><b>Field</b> — Single Line</div></div>
+    <div class="trow"><div class="tl"><b>Foreign key</b> — <code class="mono">batches.college_id</code></div><div class="tm">→</div><div class="trr"><b>Lookup field</b> pointing at Colleges</div></div>
+    <div class="trow"><div class="tl"><b>Numeric(10,2)</b></div><div class="tm">→</div><div class="trr"><b>Currency</b> or Decimal field</div></div>
+    <div class="trow"><div class="tl"><b>Text, One of (…)</b></div><div class="tm">→</div><div class="trr"><b>Dropdown</b> with those exact options</div></div>
+    <div class="trow"><div class="tl"><b>Boolean</b></div><div class="tm">→</div><div class="trr"><b>Decision box</b></div></div>
+    <div class="trow"><div class="tl"><b>Timestamptz</b></div><div class="tm">→</div><div class="trr"><b>Date-Time</b> — or a free system field</div></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">06 · Good news first</p>
+  <h2>Creator hands you four things free</h2>
+  <p class="sub">The spec lists 28 tables. You will not build 28 forms — Creator already does some of this for you.</p>
+  <div class="cards g2">
+    <div class="c hl"><p class="top">Two whole tables disappear</p><h3><code>users</code> and <code>roles</code></h3><p>The spec designs its own login and permission tables. <b>Delete both.</b> Creator has users and permission sets built in — that's exactly what they were for.</p></div>
+    <div class="c hl"><p class="top">Four columns on every form</p><h3>System fields</h3><p>The spec puts <code>id</code>, <code>created_at</code>, <code>updated_at</code> on all 28 tables. Creator gives you <b>ID, Added Time, Modified Time, Added User, Modified User</b> automatically. Don't recreate them.</p></div>
+    <div class="c hl"><p class="top">The "who did this" columns</p><h3><code>marked_by</code>, <code>entered_by</code>, <code>mapped_by</code></h3><p>Audit columns recording who took the register or entered a score. Mostly just <b>Added User</b>. Only build a real field where it may differ from the person who saved the record.</p></div>
+    <div class="c hl"><p class="top">The trainer's phone screens</p><h3>Creator mobile app</h3><p>Five of our wireframes are phone-first. <b>You don't build a separate mobile app</b> — Creator renders your forms and reports on mobile already. Design those forms for a thumb.</p></div>
+  </div>
+  <p class="note"><b>Net effect: 28 tables → roughly 24 forms and 2 subforms.</b> The next few slides explain which is which.</p>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">07 · The most important relationship</p>
+  <h2>One-to-many: the "many" side holds the lookup</h2>
+  <p class="sub">One college runs many batches. Where do you store the connection?</p>
+  <div class="ba">
+    <div class="c stop"><p class="lbl" style="color:var(--red)">Wrong instinct</p>
+      <h3>Put three "batch" fields on the college</h3>
+      <p>How many do you leave? Three? Ten? A college that runs an eleventh batch breaks the form. Nine empty fields on every other college.</p></div>
+    <div class="c hl"><p class="lbl" style="color:var(--pine)">Right</p>
+      <h3>Put one <b>Lookup</b> field on the batch</h3>
+      <p>Each batch record points at its college. Unlimited batches, no empty fields, and the report writes itself — <i>show batches where College = this one</i>.</p></div>
+  </div>
+  <p class="note" style="margin-top:18px"><b>The rule: the "many" side stores the link.</b> Each batch remembers its college; the college keeps no list. This same shape repeats everywhere — a batch has many students, a module has many topics, an invoice has many lines.</p>
+  <p class="note"><b>In Creator terms:</b> a Lookup field on Batches pointing at Colleges. That single field is what the spec calls <code class="mono">batches.college_id</code>.</p>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">08 · When one lookup isn't enough</p>
+  <h2>Many-to-many needs a form in the middle</h2>
+  <p class="sub">Real example: <b>one subject is taught by several trainers, and one trainer teaches several subjects.</b> Now neither side can hold the lookup.</p>
+  <div class="chain">
+    <div class="node"><span class="t">Subjects</span><span class="d">JavaScript</span></div>
+    <div class="tick">←</div>
+    <div class="node acc"><span class="t">Subject_Trainer_Mapping</span><span class="d">One record per fact: subject + trainer + batch</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Trainers</span><span class="d">Priya, Arun</span></div>
+  </div>
+  <p class="note" style="margin-top:18px">Each record in the middle form says one small thing: <i>"Priya teaches JavaScript in batch 2026-27."</i> Two trainers on a subject? Two records. Three? Three records. <b>No limit, no empty fields.</b> The middle form has just three Lookup fields and nothing else.</p>
+  <div class="c warn" style="margin-top:14px">
+    <p class="top">This was a real bug in the first draft</p>
+    <p>The original design put a single <code>trainer_id</code> on the subject — so JavaScript could only ever have one trainer. It was caught in review and the column removed. <b>How to spot it yourself:</b> if you can say "many X have many Y", you need the middle form. Always.</p>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-sec="Creator modelling">
+  <p class="kick">09 · The biggest Creator decision</p>
+  <h1>Subform, or separate form?</h1>
+  <p class="sub">Creator gives you something a plain database doesn't: <b>subforms</b> — child rows living inside a parent record. Powerful, but pick wrong and you rebuild.</p>
+  <div class="ba">
+    <div class="c hl"><p class="lbl" style="color:var(--pine)">Use a SUBFORM when…</p>
+      <p>The child rows are <b>only ever seen inside their parent</b>, and nothing else in the app needs to point at them.</p>
+      <p><b>Invoice lines.</b> You always look at them on the invoice. Nothing else references a single line.</p></div>
+    <div class="c warn"><p class="lbl" style="color:var(--amber)">Use a SEPARATE FORM when…</p>
+      <p>Anything else needs to <b>look up</b> to it, or you need to report across all of them at once.</p>
+      <p><b>Topics.</b> Every class session points at a topic — so Topics must be its own form.</p></div>
+  </div>
+  <div class="c stop" style="margin-top:16px">
+    <p class="top">The test that decides it</p>
+    <p style="font-size:clamp(13.5px,1.5vw,17px)"><b>"Does anything else need a Lookup pointing at this?"</b> &nbsp;If yes → separate form. You cannot build a Lookup field that points at a subform row.</p>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-sec="Creator modelling">
+  <p class="kick">10 · Applying that test</p>
+  <h2>Only two of our 28 become subforms</h2>
+  <div class="cards g2">
+    <div class="c hl"><p class="top">Subform 1</p><h3>Billing line items, inside Billing</h3><p>Each line is one class taught: hours, rate, amount. You only ever read them on the invoice, and nothing points at an individual line.</p><p><b>Bonus:</b> the invoice total is a subform sum — Creator calculates it for you.</p></div>
+    <div class="c hl"><p class="top">Subform 2</p><h3>Attendance, inside Class Session</h3><p>One register per class. The trainer opens the session and marks all 30 students inline — <b>the attendance screen basically builds itself.</b></p></div>
+    <div class="c warn"><p class="top">The catch on attendance</p><h3>Counting across sessions is harder</h3><p>Certification needs each student's percentage across <i>every</i> session. Reading that out of subforms every time is slow.</p><p><b>Fix:</b> a scheduled Deluge job that writes each student's current attendance % onto their enrollment record overnight.</p></div>
+    <div class="c"><p class="top">Everything else</p><h3>Separate forms</h3><p>Subjects, Modules, Topics, Availability, Class Session, Students, Batches… all have something pointing at them.</p><p><b>College contacts and panel scores stay as plain fields</b> — capped at 3 by business rule, so a subform buys nothing.</p></div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-sec="Creator modelling">
+  <p class="kick">11 · The whole app at a glance</p>
+  <h2>~24 forms, in nine groups</h2>
+  <p class="sub">Nobody memorises 24 forms. People remember nine groups, then look up the detail. <span style="color:var(--amber)"><b>Amber = subform.</b></span> <span style="color:var(--pine)"><b>Struck through = Creator gives it free.</b></span></p>
+  <div class="cards g4" style="gap:10px">
+    <div class="grp"><span class="n">GROUP 1</span><h4>Institutions</h4><ul><li>Colleges</li><li>Batches</li></ul></div>
+    <div class="grp"><span class="n">GROUP 2</span><h4>Entrance</h4><ul><li>Students</li><li>Panel_Members</li><li>Entrance_Score_Weights</li><li>Entrance_Exam_Scores</li><li>Panel_Sessions</li></ul></div>
+    <div class="grp"><span class="n">GROUP 3</span><h4>Enrollment</h4><ul><li>Student_Onboarding</li><li>Student_Evaluation</li><li>Certificates</li></ul></div>
+    <div class="grp"><span class="n">GROUP 4</span><h4>Curriculum</h4><ul><li>Trainers</li><li>Subjects</li><li>Subject_Trainer_Mapping</li><li>Modules</li><li>Topics</li></ul></div>
+    <div class="grp"><span class="n">GROUP 5</span><h4>Delivery</h4><ul><li>Availability</li><li>Class_Session</li><li class="sf">↳ Attendance (sub)</li><li>Assessment</li></ul></div>
+    <div class="grp"><span class="n">GROUP 6</span><h4>Access</h4><ul><li class="free">roles</li><li class="free">users</li><li style="color:var(--pine)">Creator built-in</li></ul></div>
+    <div class="grp"><span class="n">GROUP 7</span><h4>Placement</h4><ul><li>Companies</li><li>Company_Positions</li><li>Student_Interview</li><li>Placement_Tracking</li></ul></div>
+    <div class="grp"><span class="n">GROUP 8</span><h4>Money</h4><ul><li>Billing</li><li class="sf">↳ Line_Items (sub)</li></ul></div>
+    <div class="grp"><span class="n">GROUP 9</span><h4>System</h4><ul><li>Notification_Templates</li></ul></div>
+  </div>
+  <p class="note">Curriculum nests three deep: <b>Subject → Module → Topic.</b> "JavaScript" → "JS Syntax" (12 hrs) → "JS Statements" (1.5 hrs). A topic is what one class actually teaches.</p>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">12 · Now the part that matters most</p>
+  <h1>In Creator, <span style="color:var(--pine)">you</span> are the rulebook.</h1>
+  <p class="sub">A full database can refuse bad data at the storage level — it physically cannot be saved. <b>Creator can't do that.</b> Which means every rule in the spec is now your responsibility, in Deluge.</p>
+  <div class="ba">
+    <div class="c"><p class="lbl">What the spec assumes</p>
+      <p style="color:var(--ink)">"The database blocks it." Rules like <i>weights must total 1</i> or <i>one attendance mark per student</i> are written as guarantees the storage layer enforces.</p></div>
+    <div class="c hl"><p class="lbl" style="color:var(--pine)">What you'll actually do</p>
+      <p>Put each rule in the form's <b>On Validate</b> script. It runs before the record saves and can refuse with a message. <b>That is your constraint.</b></p></div>
+  </div>
+  <div class="c warn" style="margin-top:16px">
+    <p class="top">Be honest about the gap</p>
+    <p>Deluge validation runs when a <b>form</b> is submitted. It does <b>not</b> run on a bulk CSV import, and it may not fire on some API writes. So: import carefully, validate imported data separately, and never assume a rule held just because you wrote it once.</p>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">13 · Where the code goes</p>
+  <h2>Four places a script can run — pick the right one</h2>
+  <div class="cards g2">
+    <div class="c hl"><p class="top">Use this for rules</p><h3>On Validate</h3><p>Runs <b>before</b> the record is saved. Can stop the save and show a message. Every rule from the spec belongs here.</p></div>
+    <div class="c"><p class="top">Use this for consequences</p><h3>On Success</h3><p>Runs <b>after</b> a successful save. Send the email, update the related record, recalculate a total. Too late to refuse anything.</p></div>
+    <div class="c"><p class="top">Use this for help</p><h3>On User Input</h3><p>Runs as someone types. Live feedback — show the weight total as they fill it in, before they hit submit.</p></div>
+    <div class="c"><p class="top">Use this for the slow work</p><h3>Scheduled</h3><p>Runs nightly. Recalculate attendance percentages, flag sessions with missing registers, prepare draft invoices.</p></div>
+  </div>
+  <div class="code" style="margin-top:16px"><span class="cm">// On Validate — Entrance Score Weights</span>
+<span class="kw">total</span> = input.university_weight + input.attendance_weight + input.aptitude_weight
+      + input.hod_weight + input.panel_1 + input.panel_2 + input.panel_3;
+
+<span class="kw">if</span> (total != 1.0)
+{
+   <span class="kw">cancel</span> <span class="st">"Weights must add up to exactly 1. Right now they total "</span> + total;
+}</div>
+  <p class="note"><code class="mono">cancel</code> is the word that makes it a rule. Without it you've written a suggestion.</p>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">14 · Four real rules you must enforce</p>
+  <h2>Each one protects something expensive</h2>
+  <div class="cards g2">
+    <div class="c"><p class="top">Entrance scoring</p><h3>Weights must total exactly 1</h3><p>If they sum to 0.95, every candidate is quietly under-scored and the rankings are wrong. Nobody notices — the numbers just look slightly low.</p><p><b>Protects:</b> fair selection.</p></div>
+    <div class="c"><p class="top">Scoring again</p><h3>No total until all 3 panelists have scored</h3><p>Panelists interview on different days, so scores arrive piecemeal. Saving a half-scored candidate is fine. <b>Ranking one is not.</b></p><p><b>Protects:</b> fair selection.</p></div>
+    <div class="c"><p class="top">Attendance</p><h3>One mark per student per class</h3><p>Otherwise a student is marked present twice and absent once for the same session. Which is true? Nobody can say.</p><p><b>Protects:</b> honest records — and next slide, this one is genuinely tricky in Creator.</p></div>
+    <div class="c"><p class="top">Billing</p><h3>A class can be billed only once</h3><p>Generate June's invoice twice and you pay for the same class twice.</p><p><b>Protects:</b> real money.</p></div>
+  </div>
+  <p class="note"><b>And the fifth:</b> no certificate below 80% attendance. That's a promise to employers, so it can't depend on someone remembering to check.</p>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">15 · The tricky one, solved</p>
+  <h2>How to stop the same thing being recorded twice</h2>
+  <p class="sub">Creator can mark a <b>single field</b> unique. But "one mark per student <i>per session</i>" is two fields together — and Creator has no built-in way to say that.</p>
+  <div class="ba">
+    <div class="c warn"><p class="lbl" style="color:var(--amber)">The obvious way, and its flaw</p>
+      <p>In <b>On Validate</b>, search for an existing record with the same session and student. If found, <code>cancel</code>.</p>
+      <p>Works nearly always. But if two saves land at the same instant, both searches come back empty and <b>both save.</b> Rare — not impossible.</p></div>
+    <div class="c hl"><p class="lbl" style="color:var(--pine)">The sturdier way</p>
+      <p>Add a hidden Single Line field marked <b>Unique</b>. Fill it in script with the two IDs joined together.</p>
+      <p>Now Creator itself refuses the duplicate, because it's one field again. <b>The uniqueness is enforced by storage, not by your search.</b></p></div>
+  </div>
+  <div class="code" style="margin-top:14px"><span class="cm">// On Validate — build the key that cannot repeat</span>
+input.unique_key = input.Class_Session + <span class="st">"-"</span> + input.Student;</div>
+  <p class="note"><b>Use the same trick for billing:</b> a unique key on the class session in the invoice line, so one class can never appear on two invoices. Check it works in your Creator version before relying on it — then reuse it everywhere the spec says "unique when active".</p>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">16 · The lesson worth remembering</p>
+  <h2>Copy the rate onto the invoice. Don't look it up later.</h2>
+  <p class="sub">Priya teaches at <b>₹800/hour</b> in June. In July she gets a raise to <b>₹1,000/hour</b>. What should June's invoice say?</p>
+  <div class="ba">
+    <div class="c warn"><p class="lbl" style="color:var(--amber)">If the line reads her rate live from Trainers</p>
+      <p>June's invoice was 8 hrs × ₹800</p>
+      <div class="money bad">₹6,400 &nbsp;→&nbsp; ₹8,000</div>
+      <p>The moment you save her raise, <b>every past invoice silently rewrites itself.</b> Paid, closed months change value. Your books stop matching your bank.</p></div>
+    <div class="c hl"><p class="lbl" style="color:var(--pine)">If the line stores its own copy</p>
+      <p>The line saves <code>rate_applied = 800</code></p>
+      <div class="money good">₹6,400 &nbsp;→&nbsp; ₹6,400</div>
+      <p>June stays ₹6,400 forever. July uses ₹1,000. <b>History freezes; the future moves on.</b></p></div>
+  </div>
+  <p class="note"><b>In Creator this is a real trap</b>, because a Lookup makes it so easy to just show the trainer's current rate on the invoice. Don't. Copy the number into a Currency field on the line when the invoice is created, and read that from then on.</p>
+  <p class="note"><b>The general rule:</b> when a number is part of a finished transaction — a price, a rate, a tax percentage — store a copy on that transaction. Look values up live only when you <i>want</i> them to change.</p>
+</section>
+
+<!-- 18 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">17 · The opposite lesson</p>
+  <h2>Everything else: work it out, don't store it twice</h2>
+  <p class="sub">We nearly shipped a form listing which trainers work on which batch. We deleted it — the mapping form already knows.</p>
+  <div class="chain">
+    <div class="node acc"><span class="t">Subject_Trainer_Mapping</span><span class="d">"Priya teaches JavaScript in batch 2026-27"</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Already holds</span><span class="d">the trainer AND the batch</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">"Who's on this batch?"</span><span class="d">is a report, not a form</span></div>
+  </div>
+  <p class="note" style="margin-top:18px"><b>The danger of keeping both:</b> remove Priya from the batch list but leave her subject records, and the app now holds two contradictory answers to one question. Whichever report you happen to open decides what you believe. <b>Nothing errors — it just quietly disagrees with itself.</b></p>
+  <div class="c warn" style="margin-top:14px">
+    <p class="top">So which is it — copy, or calculate?</p>
+    <p><b>Copy</b> when the value must never change again (money on a finished invoice). <b>Calculate</b> when it must always be current (who teaches this batch). The one grey area is our overnight attendance percentage — a stored copy purely because recalculating it constantly would be slow. <b>Know which you're doing and why.</b></p>
+  </div>
+</section>
+
+<!-- 19 -->
+<section class="slide" data-sec="Screens">
+  <p class="kick">18 · From forms to screens</p>
+  <h2>Reports and Pages are your 23 screens</h2>
+  <p class="sub">Every wireframe is annotated with the exact fields it reads and writes — so building a screen is mostly translation, not invention.</p>
+  <div class="cards g3">
+    <div class="c hl"><p class="top">Creator does the work</p><h3>List &amp; Grid reports</h3><p>Colleges, companies, positions, curriculum, candidates. Generate the report, hide the fields you don't want, done. <b>Roughly half the screens.</b></p></div>
+    <div class="c"><p class="top">You do the work</p><h3>Pages + custom forms</h3><p>The dashboard, entrance scoring, the timetable mapper, invoice generation. Pages with panels, and forms driven by Deluge.</p></div>
+    <div class="c"><p class="top">Free on mobile</p><h3>The trainer's five</h3><p>Built as ordinary forms and reports, opened in the Creator mobile app. <b>Design for a thumb:</b> big dropdowns, few fields, no typing where a tap will do.</p></div>
+  </div>
+  <div class="c stop" style="margin-top:16px">
+    <p class="top">One principle we used on every screen</p>
+    <p style="font-size:clamp(13px,1.4vw,16px)"><b>If a rule forbids it, don't offer it.</b> The "Issue certificate" button is hidden below 80%. The timetable only lists trainers who actually teach that subject in that batch. <b>You can't make the mistake, so you never see the error.</b> In Creator that means filtered lookups and conditional buttons — not just a <code>cancel</code> message after the fact.</p>
+  </div>
+</section>
+
+<!-- 20 -->
+<section class="slide" data-sec="Screens">
+  <p class="kick">19 · Keeping the two logins apart</p>
+  <h2>How a trainer only ever sees their own work</h2>
+  <p class="sub">This is the single most important permission in the app — and it's easy to get wrong in a way nobody notices until a trainer sees someone else's pay.</p>
+  <div class="chain">
+    <div class="node"><span class="t">1. Users field</span><span class="d">On the Trainers form, linking to their Creator login</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">2. Report criteria</span><span class="d">Show sessions where Trainer's user = logged-in user</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">3. Permission set</span><span class="d">Trainers can open only their five screens</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">4. Test as a trainer</span><span class="d">Log in as one. Try to reach an admin report.</span></div>
+  </div>
+  <p class="note" style="margin-top:18px"><b>That Users field is what the spec calls <code class="mono">trainers.user_id</code></b> — it exists precisely so a login can be tied back to a trainer record. It's the hinge the whole permission model hangs on.</p>
+  <p class="note"><b>Step 4 is not optional.</b> Permission bugs are invisible to the person who wrote them — you always test as yourself, and you're an admin. Make a test trainer login on day one and keep using it.</p>
+</section>
+
+<!-- 21 -->
+<section class="slide" data-sec="The flows">
+  <p class="kick">20 · Flow A</p>
+  <h2>Entrance: from applicant to enrolled student</h2>
+  <div class="chain">
+    <div class="node"><span class="t">1. Register</span><span class="d">Candidates added with parent details</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">2. Schedule panels</span><span class="d">One record per panelist per day</span></div>
+    <div class="tick">→</div>
+    <div class="node amb"><span class="t">3. Interviews</span><span class="d">Happens offline — paper scores</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">4. Enter scores</span><span class="d">Coordinator types in all 3 panel scores</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">5. Compute</span><span class="d">Blocked until 3 of 3 are in</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">6. Rank &amp; select</span><span class="d">Top N, cutoff line</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">7. Onboard</span><span class="d">Deposit, income proof, track</span></div>
+  </div>
+  <p class="note"><b>Amber = happens in the real world</b>, not in the app. Worth marking, because that's where data gets delayed or lost.</p>
+  <p class="note"><b>Panel members never log in.</b> They score on paper; a coordinator types it all in. That was a deliberate decision — it means no panelist accounts, no training them on the app, and one person responsible for the numbers.</p>
+</section>
+
+<!-- 22 -->
+<section class="slide" data-sec="The flows">
+  <p class="kick">21 · Flow B — the daily one</p>
+  <h2>Running a class, and marking who came</h2>
+  <div class="chain">
+    <div class="node amb"><span class="t">College offers a slot</span><span class="d">Room + students free, Tue 9–11</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Admin records it</span><span class="d">Date, time, Lab or Classroom</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Maps a class on</span><span class="d">Pick topic + trainer</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Trainer's phone</span><span class="d">Appears in their schedule</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Teaches, taps done</span><span class="d">Records actual start / end</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Marks the register</span><span class="d">Present / Absent / Late / Excused</span></div>
+  </div>
+  <div class="cards g2" style="margin-top:18px">
+    <div class="c"><p class="top">Why "actual" times, not planned</p><p style="color:var(--ink)">The slot said 9:00–11:00. The class ran 9:05–11:00. <b>We pay for what happened, not what was scheduled</b> — so the trainer records real times, and billing reads those.</p></div>
+    <div class="c"><p class="top">Why the register can't be half-done</p><p style="color:var(--ink)">Every enrolled student needs a row. A partly-filled register is worse than none — it looks complete while quietly under-counting someone's attendance, <b>which decides their certificate.</b></p></div>
+  </div>
+  <p class="note"><b>Creator tip:</b> pre-fill the attendance subform with the batch's enrolled students when the session opens, so the trainer only changes the exceptions. Everyone defaults to Present; they tap the three who aren't.</p>
+</section>
+
+<!-- 23 -->
+<section class="slide" data-sec="The flows">
+  <p class="kick">22 · Flow C — follow the money</p>
+  <h2>How a taught hour becomes a paid invoice</h2>
+  <div class="chain">
+    <div class="node"><span class="t">A class happens</span><span class="d">Status = conducted, real times recorded</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">A line on the invoice</span><span class="d">1.92 hrs × ₹800 (rate copied) = ₹1,536</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">The invoice</span><span class="d">All June's lines, summed by the subform</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Approved &amp; paid</span><span class="d">Lines freeze — fixes become new lines</span></div>
+  </div>
+  <p class="note" style="margin-top:18px"><b>Every rupee traces back to a specific class on a specific day.</b> If Priya questions her invoice, you show her the exact sessions on it. That's why line items exist at all — the original design had only a total, which is impossible to defend or debug.</p>
+  <div class="cards g2" style="margin-top:14px">
+    <div class="c"><p class="top">Two kinds of payee, one set of forms</p><p style="color:var(--ink)">Trainers bill for classes; panel members bill for interview sittings. Same Billing form. A rule guarantees each invoice has <b>exactly one</b> payee — never zero, never both.</p></div>
+    <div class="c"><p class="top">Attendance never affects pay</p><p style="color:var(--ink)">A trainer is paid for teaching whether 30 students came or 4. <b>The attendance chain and the money chain stay completely separate.</b></p></div>
+  </div>
+</section>
+
+<!-- 24 -->
+<section class="slide" data-sec="Building it">
+  <p class="kick">23 · How to build</p>
+  <h2>Thin slices, not layers</h2>
+  <p class="sub">The instinct is to build all 24 forms, then all the reports, then all the scripts. Don't. <b>Build one complete journey at a time</b> — each slice is something you can show a coordinator and get corrections on.</p>
+  <div class="chain">
+    <div class="node acc"><span class="t">Slice 0</span><span class="d">Forms + lookups for groups 1–4. No scripts yet.</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Slice 1</span><span class="d">College → batch → weights. Proves logins &amp; permission sets.</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Slice 2</span><span class="d">Entrance → scoring → selection → onboarding</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Slice 3</span><span class="d">Timetable + attendance. <b>Now it's usable daily.</b></span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Slice 4</span><span class="d">Billing &amp; certificates — needed monthly, not daily</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Slice 5</span><span class="d">Placement — a year away for the first batch</span></div>
+  </div>
+  <p class="note"><b>Why this order:</b> it follows the student's journey, so every slice is real and demoable. The first invoice isn't due until a month after teaching starts, and placement isn't needed until the first batch graduates. <b>Get the daily screens right first.</b></p>
+  <p class="note"><b>One warning:</b> get the lookups and the two subforms right in Slice 0. Changing a field into a subform later, after there's data in it, is painful.</p>
+</section>
+
+<!-- 25 -->
+<section class="slide" data-sec="Building it">
+  <p class="kick">24 · Still open</p>
+  <h2>Three decisions needed before you build the forms</h2>
+  <p class="sub">Everything else is settled. These three change the <b>structure</b>, and structure is cheapest to change before there's data in it.</p>
+  <div class="qlist">
+    <div class="q"><span class="qn">QUESTION 4</span><p><b>Does the Zoho vs non-Zoho track change what's taught?</b> Nothing currently connects a student's track to a set of subjects. If the tracks study different things, you need another lookup — and the timetable must filter by it.</p></div>
+    <div class="q"><span class="qn">QUESTION 7</span><p><b>Does the app generate certificate PDFs, or just record that one was issued?</b> We store a template link but have nowhere to put the finished file. Creator can generate PDFs — if we use that, we need a field for the output.</p></div>
+    <div class="q"><span class="qn">QUESTION 10</span><p><b>What happens to the deposit if a student drops out?</b> Refunds are defined for students who complete. Dropouts aren't — and that's exactly when someone asks for their money back.</p></div>
+  </div>
+  <p class="note">There are ten open questions in total; the other seven affect screens rather than structure, so they can be answered while you build.</p>
+</section>
+
+<!-- 26 -->
+<section class="slide" data-sec="Wrap up">
+  <p class="kick">25 · Take these away</p>
+  <h1>Six things to remember</h1>
+  <div class="cards g2">
+    <div class="c hl"><h3>1 · Nouns become forms</h3><p>Including events — "a class happened", "someone was present", "an invoice was raised".</p></div>
+    <div class="c hl"><h3>2 · The many side holds the lookup</h3><p>And when both sides are "many", build a mapping form in the middle.</p></div>
+    <div class="c hl"><h3>3 · Subform only if nothing points at it</h3><p>If another form needs a Lookup to it, it must be its own form.</p></div>
+    <div class="c hl"><h3>4 · You are the constraint</h3><p>Every rule lives in <b>On Validate</b>, ending in <code>cancel</code>. Creator won't catch it for you.</p></div>
+    <div class="c hl"><h3>5 · Freeze money, calculate the rest</h3><p>Copy rates onto invoice lines. Everything else, work out from one source of truth.</p></div>
+    <div class="c hl"><h3>6 · Never delete — deactivate</h3><p>Set <code>active</code> to false. History has to stay standing, or last year's invoices stop making sense.</p></div>
+  </div>
+  <p class="note" style="margin-top:18px"><b>Where everything lives:</b> <code class="mono">APP-Data-Structure-Detailed.md</code> has all 28 tables with every field explained. <code class="mono">APP-Wireframes-Storyboards.html</code> has the 23 screens and 10 flows, each annotated with the fields it touches.</p>
+  <p class="note">Questions now — and <b>if something in the design looks wrong to you, say so.</b> Six real bugs were caught by exactly that kind of second look, including the one-trainer-per-subject mistake on slide 9.</p>
+</section>
+
+</div>
+
+<div class="prog" id="prog"></div>
+<div class="bar">
+  <span class="lbl" id="secl">Start here</span>
+  <span class="sp"></span>
+  <button class="nb" id="prev" aria-label="Previous slide">←</button>
+  <span class="cnt" id="cnt">1 / 26</span>
+  <button class="nb" id="next" aria-label="Next slide">→</button>
+</div>
+
+<script>
+(function(){
+  var s = Array.prototype.slice.call(document.querySelectorAll('.slide')),
+      i = 0, n = s.length,
+      cnt = document.getElementById('cnt'),
+      secl = document.getElementById('secl'),
+      prog = document.getElementById('prog'),
+      prev = document.getElementById('prev'),
+      next = document.getElementById('next');
+  function show(k){
+    i = Math.max(0, Math.min(n - 1, k));
+    s.forEach(function(el, j){ el.classList.toggle('on', j === i); });
+    cnt.textContent = (i + 1) + ' / ' + n;
+    secl.textContent = s[i].getAttribute('data-sec') || '';
+    prog.style.width = ((i + 1) / n * 100) + '%';
+    prev.disabled = (i === 0);
+    next.disabled = (i === n - 1);
+    window.scrollTo(0, 0);
+  }
+  prev.addEventListener('click', function(){ show(i - 1); });
+  next.addEventListener('click', function(){ show(i + 1); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ show(i + 1); e.preventDefault(); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ show(i - 1); e.preventDefault(); }
+    else if(e.key === 'Home'){ show(0); }
+    else if(e.key === 'End'){ show(n - 1); }
+  });
+  show(0);
+})();
+</script>

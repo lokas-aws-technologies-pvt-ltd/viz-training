@@ -1,0 +1,576 @@
+<title>Igiver Platform — Team Briefing</title>
+<style>
+:root{
+  --paper:#F2F4F1; --card:#FFFFFF; --sunk:#E8EDEA;
+  --ink:#16211F; --mut:#5E6E69; --line:#C4D0CB;
+  --pine:#1B6455; --pine-soft:#DDEBE6;
+  --amber:#A2660D; --amber-soft:#F6EBD8;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#121816; --card:#1A2220; --sunk:#141B19;
+  --ink:#E3E9E6; --mut:#93A49F; --line:#35433F;
+  --pine:#63C3AB; --pine-soft:#1B342E;
+  --amber:#DFAA55; --amber-soft:#382C19;
+}}
+:root[data-theme="dark"]{
+  --paper:#121816; --card:#1A2220; --sunk:#141B19;
+  --ink:#E3E9E6; --mut:#93A49F; --line:#35433F;
+  --pine:#63C3AB; --pine-soft:#1B342E;
+  --amber:#DFAA55; --amber-soft:#382C19;
+}
+:root[data-theme="light"]{
+  --paper:#F2F4F1; --card:#FFFFFF; --sunk:#E8EDEA;
+  --ink:#16211F; --mut:#5E6E69; --line:#C4D0CB;
+  --pine:#1B6455; --pine-soft:#DDEBE6;
+  --amber:#A2660D; --amber-soft:#F6EBD8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.dsp{font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+.mono,code{font-family:ui-monospace,"SF Mono","Cascadia Code",Consolas,monospace}
+button:focus-visible{outline:2px solid var(--pine);outline-offset:3px}
+
+/* ---------- deck shell ---------- */
+.deck{min-height:100vh;display:flex;flex-direction:column}
+.slide{display:none;flex:1;padding:clamp(24px,4vw,56px) clamp(20px,5vw,72px) 84px;
+  flex-direction:column;justify-content:center;max-width:1180px;margin:0 auto;width:100%}
+.slide.on{display:flex}
+.kick{font-family:ui-monospace,monospace;font-size:clamp(11px,1.1vw,13px);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--pine);margin:0 0 14px}
+h1{font-family:Georgia,serif;font-size:clamp(30px,5.4vw,62px);line-height:1.06;margin:0 0 18px;
+  font-weight:400;letter-spacing:-.015em;text-wrap:balance}
+h2{font-family:Georgia,serif;font-size:clamp(24px,3.6vw,42px);line-height:1.12;margin:0 0 8px;
+  font-weight:400;letter-spacing:-.01em;text-wrap:balance}
+.sub{font-size:clamp(15px,1.7vw,21px);color:var(--mut);margin:0 0 26px;max-width:60ch;line-height:1.45}
+.sub b{color:var(--ink);font-weight:600}
+p.note{font-size:clamp(13px,1.3vw,16px);color:var(--mut);max-width:66ch;margin:18px 0 0}
+p.note b{color:var(--ink)}
+
+/* ---------- nav ---------- */
+.bar{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;gap:14px;
+  padding:0 clamp(16px,4vw,40px);background:var(--paper);border-top:1px solid var(--line);z-index:20}
+.bar .lbl{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--mut);letter-spacing:.05em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .sp{flex:1}
+.nb{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:7px;
+  width:38px;height:34px;font-size:15px;cursor:pointer;line-height:1}
+.nb:hover{border-color:var(--pine);color:var(--pine)}
+.nb:disabled{opacity:.35;cursor:default}
+.cnt{font-family:ui-monospace,monospace;font-size:12.5px;font-variant-numeric:tabular-nums;min-width:52px;text-align:center}
+.prog{position:fixed;left:0;bottom:56px;height:2px;background:var(--pine);z-index:21;transition:width .18s}
+@media (prefers-reduced-motion:reduce){.prog{transition:none}}
+
+/* ---------- building blocks ---------- */
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.cards{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}
+.c{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:clamp(14px,1.7vw,20px)}
+.c h3{margin:0 0 6px;font-size:clamp(15px,1.6vw,18px)}
+.c p{margin:0;font-size:clamp(12.5px,1.25vw,14.5px);color:var(--mut);line-height:1.5}
+.c code{font-size:.88em;color:var(--pine)}
+.c .top{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--pine);margin:0 0 8px}
+.c.hl{border-color:var(--pine);background:var(--pine-soft)}
+.c.warn{border-color:var(--amber);background:var(--amber-soft)}
+.c.warn .top{color:var(--amber)}
+
+/* chain diagram */
+.chain{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;row-gap:12px}
+.node{flex:1;min-width:118px;background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:12px 10px;text-align:center;display:flex;flex-direction:column;gap:5px;justify-content:center}
+.node .t{font-size:clamp(12.5px,1.3vw,15px);font-weight:600;line-height:1.25}
+.node .d{font-size:clamp(10.5px,1.05vw,12px);color:var(--mut);line-height:1.35}
+.node.acc{border-color:var(--pine);background:var(--pine-soft)}
+.node.amb{border-color:var(--amber);background:var(--amber-soft)}
+.tick{flex:0 0 26px;display:flex;align-items:center;justify-content:center;color:var(--line);font-size:17px}
+
+/* one-to-many visual */
+.rel{display:flex;align-items:center;gap:clamp(14px,3vw,42px);flex-wrap:wrap}
+.one{background:var(--pine-soft);border:2px solid var(--pine);border-radius:12px;padding:16px 22px;
+  font-weight:600;font-size:clamp(14px,1.6vw,18px);white-space:nowrap}
+.fan{display:flex;flex-direction:column;gap:8px}
+.many{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 16px;
+  font-size:clamp(12.5px,1.35vw,15px);white-space:nowrap}
+.legs{flex:0 0 44px;position:relative;align-self:stretch;min-height:100px}
+.legs svg{position:absolute;inset:0;width:100%;height:100%}
+
+/* table-group grid */
+.grp{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 13px}
+.grp .n{font-family:ui-monospace,monospace;font-size:10px;color:var(--pine);letter-spacing:.08em}
+.grp h4{margin:3px 0 6px;font-size:clamp(13px,1.35vw,15.5px)}
+.grp ul{margin:0;padding:0;list-style:none;font-size:clamp(10.5px,1.1vw,12.5px);color:var(--mut);line-height:1.7}
+.grp li code{font-size:1em;color:var(--mut)}
+
+/* map rows */
+.map{display:flex;flex-direction:column;gap:9px}
+.mrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mreal{flex:0 0 auto;min-width:190px;background:var(--card);border:1px solid var(--line);
+  border-radius:8px;padding:9px 14px;font-size:clamp(13px,1.4vw,16px)}
+.marr{color:var(--mut);font-family:ui-monospace,monospace;font-size:13px}
+.mtab{font-family:ui-monospace,monospace;font-size:clamp(12px,1.3vw,15px);color:var(--pine);
+  background:var(--pine-soft);border-radius:7px;padding:8px 14px}
+
+/* before / after */
+.ba{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.ba .c .lbl{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;margin:0 0 8px}
+.money{font-family:ui-monospace,monospace;font-size:clamp(15px,2vw,22px);font-variant-numeric:tabular-nums;
+  margin:8px 0;font-weight:600}
+.bad{color:var(--amber)}
+.good{color:var(--pine)}
+
+/* role columns */
+.roles{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.role .who{font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--pine);margin:0 0 4px}
+.role ul{margin:8px 0 0;padding:0 0 0 16px;font-size:clamp(12px,1.2vw,14px);color:var(--mut);line-height:1.65}
+
+/* stat strip */
+.stats{display:flex;gap:12px;flex-wrap:wrap}
+.st{flex:1;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.st .v{font-family:Georgia,serif;font-size:clamp(24px,3.2vw,38px);line-height:1;font-variant-numeric:tabular-nums}
+.st .k{font-size:clamp(11px,1.1vw,13px);color:var(--mut);margin-top:5px}
+
+/* q list */
+.qlist{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.q{background:var(--amber-soft);border:1px solid var(--amber);border-radius:10px;padding:11px 14px}
+.q .qn{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--amber);letter-spacing:.08em}
+.q p{margin:4px 0 0;font-size:clamp(12px,1.2vw,14px);line-height:1.45}
+
+.kbd{font-family:ui-monospace,monospace;font-size:11px;border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:5px;padding:2px 7px;background:var(--card)}
+
+/* ---------- print: all slides stacked ---------- */
+@page{size:A4 landscape;margin:10mm}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  :root{--paper:#fff;--card:#fff;--ink:#16211F;--mut:#5E6E69;--line:#C4D0CB;
+        --pine:#1B6455;--pine-soft:#DDEBE6;--amber:#A2660D;--amber-soft:#F6EBD8}
+  .bar,.prog{display:none}
+  .slide{display:flex!important;break-after:page;padding:0 0 10mm;min-height:0;justify-content:flex-start}
+  .slide:last-child{break-after:auto}
+}
+</style>
+
+<div class="deck" id="deck">
+
+<!-- 1 -->
+<section class="slide on" data-sec="Start here">
+  <p class="kick">Team briefing · Igiver training platform</p>
+  <h1>What we're building,<br>and why it's shaped this way</h1>
+  <p class="sub">A walk through the whole system — the programme it runs, the data behind it, the rules the database enforces, and how we'll build it. <b>No prior knowledge assumed.</b></p>
+  <div class="stats">
+    <div class="st"><div class="v">28</div><div class="k">database tables</div></div>
+    <div class="st"><div class="v">23</div><div class="k">screens designed</div></div>
+    <div class="st"><div class="v">10</div><div class="k">user flows mapped</div></div>
+    <div class="st"><div class="v">3</div><div class="k">types of user</div></div>
+  </div>
+  <p class="note">Navigate with <span class="kbd">←</span> <span class="kbd">→</span> or the buttons below.</p>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-sec="The programme">
+  <p class="kick">01 · The idea in one sentence</p>
+  <h2>We run a free training programme that takes students from college into jobs.</h2>
+  <p class="sub">Colleges send us candidates. We interview and pick the best. We train them for about a year. If they attend enough, they get certified. Then we help them get hired. <b>Everything in the system exists to run or record part of that.</b></p>
+  <div class="cards g3">
+    <div class="c"><p class="top">Who sends students</p><h3>Colleges</h3><p>Partner institutions. They host the classes on their own campus and give us candidates.</p></div>
+    <div class="c"><p class="top">Who we serve</p><h3>Students</h3><p>Candidates from low-income families — under ₹4 lakh a year. They pay a refundable deposit, nothing more.</p></div>
+    <div class="c"><p class="top">Who teaches</p><h3>Trainers</h3><p>Paid per hour taught. JavaScript, HTML, CSS, Zoho Creator and more.</p></div>
+    <div class="c"><p class="top">Who selects</p><h3>Panel members</h3><p>External interviewers who score candidates at entrance. Also paid per hour.</p></div>
+    <div class="c"><p class="top">Who hires</p><h3>Companies</h3><p>Employers who interview our graduates and make offers.</p></div>
+    <div class="c hl"><p class="top">And us</p><h3>The coordinators</h3><p>Staff who run all of it — and the main users of the app we're building.</p></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-sec="The programme">
+  <p class="kick">02 · The journey, end to end</p>
+  <h2>One student's path through the system</h2>
+  <p class="sub">Every screen we build sits somewhere on this line. When you're lost, come back to it.</p>
+  <div class="chain">
+    <div class="node"><span class="t">College signs up</span><span class="d">Partner agreed, batch created</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Students apply</span><span class="d">Candidates registered</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Entrance</span><span class="d">Marks, aptitude test, 3 interviews</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Selected</span><span class="d">Ranked, top N enrolled, deposit paid</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Trained</span><span class="d">~300 hours of classes over a year</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Certified</span><span class="d">If attendance ≥ 80%</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Placed</span><span class="d">Interviews, offer, job</span></div>
+  </div>
+  <p class="note"><b>Running alongside the whole time:</b> trainers and panel members record their hours, and get invoiced and paid monthly. That's a second track through the same system.</p>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-sec="The programme">
+  <p class="kick">03 · Who logs in</p>
+  <h2>Three kinds of user — and three very different screens</h2>
+  <p class="sub">Students, colleges and panel members have <b>no logins</b>. This is an internal tool for staff. That single decision shapes half the design.</p>
+  <div class="roles">
+    <div class="c role"><p class="who">Desktop</p><h3>Admin / Coordinator</h3><p>Runs everything. 14 of our 23 screens.</p>
+      <ul><li>Colleges, batches, candidates</li><li>Entrance scoring and selection</li><li>Curriculum and timetable</li><li>Certificates and billing</li></ul></div>
+    <div class="c role"><p class="who">Phone first</p><h3>Trainer</h3><p>Uses it standing in a classroom. 5 screens, big buttons.</p>
+      <ul><li>My schedule today</li><li>Start/end a class</li><li>Take attendance</li><li>Enter test scores</li><li>See my invoices</li></ul></div>
+    <div class="c role"><p class="who">Desktop</p><h3>Placement officer</h3><p>Only the job-hunting part. 3 screens.</p>
+      <ul><li>Companies and open roles</li><li>Interview rounds</li><li>Offers and salaries</li></ul></div>
+  </div>
+  <p class="note">Why does this matter so early? Because <b>"who can see this?" changes every query we write.</b> A trainer must only ever load their own sessions and their own invoices.</p>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">04 · Turning a story into a database</p>
+  <h2>Every important noun becomes a table</h2>
+  <p class="sub">That's genuinely the whole trick. Read the story back, underline the nouns, and each one gets a table with columns for the facts you need about it.</p>
+  <div class="map">
+    <div class="mrow"><div class="mreal">"St. Mary's College"</div><span class="marr">becomes a row in</span><span class="mtab">colleges</span></div>
+    <div class="mrow"><div class="mreal">"The 2026–27 group"</div><span class="marr">becomes a row in</span><span class="mtab">batches</span></div>
+    <div class="mrow"><div class="mreal">"Ananya, a candidate"</div><span class="marr">becomes a row in</span><span class="mtab">students</span></div>
+    <div class="mrow"><div class="mreal">"Monday 9am JavaScript class"</div><span class="marr">becomes a row in</span><span class="mtab">class_session</span></div>
+    <div class="mrow"><div class="mreal">"Ananya was present"</div><span class="marr">becomes a row in</span><span class="mtab">session_attendance</span></div>
+    <div class="mrow"><div class="mreal">"June invoice for Priya"</div><span class="marr">becomes a row in</span><span class="mtab">billing</span></div>
+  </div>
+  <p class="note">Notice the last two. <b>Events and records are nouns too</b> — "an attendance mark", "an invoice". Beginners usually spot people and places, then miss the events. Most of our 28 tables are events.</p>
+</section>
+
+<!-- 6 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">05 · If you've built in Zoho Creator</p>
+  <h2>You already know most of this — different words</h2>
+  <p class="sub">The concepts carry over almost one to one. What changes is that the database itself will enforce far more of the rules, instead of your scripts doing it.</p>
+  <div class="cards g2">
+    <div class="c"><p class="top">Creator</p><h3>Form</h3><p>Where you define fields and collect records.</p></div>
+    <div class="c hl"><p class="top">Database</p><h3>Table</h3><p>Same idea. <code>colleges</code> is a form; each college is a record/row.</p></div>
+    <div class="c"><p class="top">Creator</p><h3>Field</h3><p>Single line, number, date, decision box…</p></div>
+    <div class="c hl"><p class="top">Database</p><h3>Column</h3><p><code>Text</code>, <code>Integer</code>, <code>Date</code>, <code>Boolean</code>. Same types, plainer names.</p></div>
+    <div class="c"><p class="top">Creator</p><h3>Lookup field</h3><p>Points a record at another form's record.</p></div>
+    <div class="c hl"><p class="top">Database</p><h3>Foreign key</h3><p>Exactly this. <code>batches.college_id</code> points at a row in <code>colleges</code>.</p></div>
+    <div class="c"><p class="top">Creator</p><h3>Deluge validation</h3><p>Your script checks the rule when the form is submitted.</p></div>
+    <div class="c warn"><p class="top">Database</p><h3>Constraint</h3><p>The rule lives in the table itself. <b>It holds even if someone bypasses the app.</b> This is the big upgrade — next few slides.</p></div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">06 · The most important relationship</p>
+  <h2>One-to-many: the "many" side holds the link</h2>
+  <p class="sub">One college runs many batches. Ask yourself: where do we store the connection?</p>
+  <div class="rel">
+    <div class="one">1 college<br><span class="mono" style="font-size:12px;font-weight:400">St. Mary's</span></div>
+    <div class="legs"><svg viewBox="0 0 44 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 60 C 22 60, 22 20, 44 20" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--line)"/>
+      <path d="M0 60 C 22 60, 22 60, 44 60" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--line)"/>
+      <path d="M0 60 C 22 60, 22 100, 44 100" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--line)"/>
+    </svg></div>
+    <div class="fan">
+      <div class="many">batch 2025-26 &nbsp;<code class="mono" style="color:var(--pine);font-size:11px">college_id → St. Mary's</code></div>
+      <div class="many">batch 2026-27 &nbsp;<code class="mono" style="color:var(--pine);font-size:11px">college_id → St. Mary's</code></div>
+      <div class="many">batch 2027-28 &nbsp;<code class="mono" style="color:var(--pine);font-size:11px">college_id → St. Mary's</code></div>
+    </div>
+  </div>
+  <p class="note"><b>The rule: the "many" side stores the ID of the "one" side.</b> Each batch remembers its college. The college doesn't keep a list of batches — you'd never know how many slots to leave. To get a college's batches you ask: <code class="mono">give me all batches where college_id = this one</code>.</p>
+  <p class="note">This same shape repeats everywhere: a batch has many students, a module has many topics, an invoice has many line items.</p>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">07 · When one-to-many isn't enough</p>
+  <h2>Many-to-many needs a table in the middle</h2>
+  <p class="sub">Real example from our system: <b>one subject is taught by several trainers, and one trainer teaches several subjects.</b> Now neither side can hold the link.</p>
+  <div class="ba">
+    <div class="c warn">
+      <p class="lbl" style="color:var(--amber)">Doesn't work</p>
+      <h3>Put <code>trainer_id</code> on the subject</h3>
+      <p>JavaScript can then only have one trainer. But Priya and Arun both teach it. We had this bug in the first draft of the schema — it's why the column was removed.</p>
+    </div>
+    <div class="c hl">
+      <p class="lbl" style="color:var(--pine)">Works</p>
+      <h3>A third table: <code>subject_trainer_mapping</code></h3>
+      <p>Each row says one small fact: <i>"Priya teaches JavaScript in batch 2026-27."</i> Want two trainers? Two rows. Want three? Three rows. No limit, no empty columns.</p>
+    </div>
+  </div>
+  <div class="chain" style="margin-top:16px">
+    <div class="node"><span class="t">subjects</span><span class="d">JavaScript</span></div>
+    <div class="tick">←</div>
+    <div class="node acc"><span class="t">subject_trainer_mapping</span><span class="d">subject + trainer + batch, one row per fact</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">trainers</span><span class="d">Priya, Arun</span></div>
+  </div>
+  <p class="note"><b>How to spot it:</b> if you can say "many X have many Y", you need the middle table. Always.</p>
+</section>
+
+<!-- 9 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">08 · The shape of every table</p>
+  <h2>Four columns appear on all 28 tables</h2>
+  <p class="sub">Learn these once and 28 tables get much less intimidating.</p>
+  <div class="cards g4">
+    <div class="c"><p class="top">Identity</p><h3><code>id</code></h3><p>A unique code for the row. We use UUIDs — long random values, never reused, never guessable.</p></div>
+    <div class="c"><p class="top">Soft delete</p><h3><code>active</code></h3><p>true/false. Setting it false <b>hides</b> a row instead of destroying it.</p></div>
+    <div class="c"><p class="top">Audit</p><h3><code>created_at</code></h3><p>When the row was made. Never changes.</p></div>
+    <div class="c"><p class="top">Audit</p><h3><code>updated_at</code></h3><p>When it last changed. Answers "who changed this and when?"</p></div>
+  </div>
+  <div class="c warn" style="margin-top:18px">
+    <p class="top">Why we never truly delete anything</p>
+    <p style="color:var(--ink);font-size:clamp(13px,1.35vw,15.5px)">Suppose a trainer leaves and you delete them. Every invoice you ever paid them now points at nothing. Last year's classes have no teacher. Your accounts break retroactively. <b>So we set <code>active = false</code> instead:</b> they vanish from dropdowns and lists, while history stays intact and honest.</p>
+  </div>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-sec="The data">
+  <p class="kick">09 · The whole schema at a glance</p>
+  <h2>28 tables, in nine groups</h2>
+  <p class="sub">Nobody memorises 28 tables. People remember nine groups, then look up the detail.</p>
+  <div class="cards g4" style="gap:11px">
+    <div class="grp"><span class="n">GROUP 1</span><h4>Institutions</h4><ul><li>colleges</li><li>batches</li></ul></div>
+    <div class="grp"><span class="n">GROUP 2</span><h4>Entrance</h4><ul><li>students</li><li>panel_members</li><li>entrance_score_weights</li><li>entrance_exam_scores</li><li>panel_sessions</li></ul></div>
+    <div class="grp"><span class="n">GROUP 3</span><h4>Enrollment</h4><ul><li>student_selection_onboarding</li><li>student_evaluation</li><li>certificates</li></ul></div>
+    <div class="grp"><span class="n">GROUP 4</span><h4>Curriculum</h4><ul><li>trainers</li><li>subjects</li><li>subject_trainer_mapping</li><li>modules</li><li>topics</li></ul></div>
+    <div class="grp"><span class="n">GROUP 5</span><h4>Delivery</h4><ul><li>availability</li><li>class_session</li><li>session_attendance</li><li>assessment</li></ul></div>
+    <div class="grp"><span class="n">GROUP 6</span><h4>Access</h4><ul><li>roles</li><li>users</li></ul></div>
+    <div class="grp"><span class="n">GROUP 7</span><h4>Placement</h4><ul><li>companies</li><li>company_positions</li><li>student_interview</li><li>placement_tracking</li></ul></div>
+    <div class="grp"><span class="n">GROUP 8</span><h4>Money</h4><ul><li>billing</li><li>billing_line_items</li></ul></div>
+    <div class="grp"><span class="n">GROUP 9</span><h4>System</h4><ul><li>notification_templates</li></ul></div>
+  </div>
+  <p class="note">Curriculum nests three deep: <b>Subject → Module → Topic.</b> "JavaScript" → "JS Syntax" (12 hrs) → "JS Statements" (1.5 hrs). A topic is what one class actually teaches.</p>
+</section>
+
+<!-- 11 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">10 · The part that matters most</p>
+  <h1>Let the database say&nbsp;no.</h1>
+  <p class="sub">You could check every rule in your app code. Most beginners do. Here's why we don't rely on that alone — and this is the single biggest idea in the briefing.</p>
+  <div class="ba">
+    <div class="c warn"><p class="lbl" style="color:var(--amber)">Rules only in app code</p>
+      <p style="color:var(--ink)">Works — until someone imports a spreadsheet, runs a fix-it script, uses a second app, or you simply forget the check on one screen out of twenty. <b>Then bad data is already saved</b>, and you find out months later from an accountant.</p></div>
+    <div class="c hl"><p class="lbl" style="color:var(--pine)">Rules in the database</p>
+      <p style="color:var(--ink)">The rule sits on the table. Every route in — app, script, import, console — hits the same wall. <b>Invalid data cannot physically be stored.</b> You get an error immediately, not a mystery next quarter.</p></div>
+  </div>
+  <p class="note">Both, ideally: check in the app for a friendly message, <b>and</b> in the database so it's actually guaranteed. The app's job is a nice error. The database's job is the truth.</p>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">11 · Four real rules from our system</p>
+  <h2>What that looks like in practice</h2>
+  <div class="cards g2">
+    <div class="c"><p class="top">Entrance scoring</p><h3>The weights must total exactly 1</h3><p>Marks, attendance, aptitude, HOD, and 3 panelists are weighted. If they sum to 0.95, every candidate is quietly under-scored and rankings are wrong. The table refuses to save unless the seven add to <code>1.0000</code>.</p></div>
+    <div class="c"><p class="top">Attendance</p><h3>One mark per student per class</h3><p>Without this, a student can be marked present twice and absent once for the same session. Which is true? The database allows exactly one row per student per class.</p></div>
+    <div class="c"><p class="top">Billing</p><h3>A class can be billed only once</h3><p>Generate June's invoice twice and you'd pay the same class twice. Each session can appear on <b>one</b> invoice line, ever. Real money, protected by one line of schema.</p></div>
+    <div class="c"><p class="top">Certification</p><h3>No certificate below 80% attendance</h3><p>The rule is a promise to employers, so it can't depend on someone remembering to check. Attendance is computed from real marks; below the line, issuing is blocked.</p></div>
+  </div>
+  <p class="note"><b>Notice the pattern:</b> each rule protects something expensive — fair rankings, honest records, real money, our reputation. That's how you decide what deserves a constraint.</p>
+</section>
+
+<!-- 13 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">12 · The lesson worth remembering</p>
+  <h2>Copy the number onto the invoice. Don't look it up later.</h2>
+  <p class="sub">Priya teaches for us at <b>₹800/hour</b> in June. In July, she gets a raise to <b>₹1,000/hour</b>. What should June's invoice say?</p>
+  <div class="ba">
+    <div class="c warn"><p class="lbl" style="color:var(--amber)">If the invoice reads her current rate</p>
+      <p style="color:var(--ink)">June's invoice was 8 hrs × ₹800</p>
+      <div class="money bad">₹6,400 &nbsp;→&nbsp; ₹8,000</div>
+      <p style="color:var(--ink)">The moment you save her raise, <b>every past invoice silently rewrites itself.</b> Paid, closed months change value. Your books stop matching your bank.</p></div>
+    <div class="c hl"><p class="lbl" style="color:var(--pine)">If we copy the rate onto the line</p>
+      <p style="color:var(--ink)">The line stores <code>rate_applied = 800</code></p>
+      <div class="money good">₹6,400 &nbsp;→&nbsp; ₹6,400</div>
+      <p style="color:var(--ink)">June stays ₹6,400 forever. July uses ₹1,000. <b>History is frozen; the future moves on.</b></p></div>
+  </div>
+  <p class="note"><b>The general rule:</b> when a number is part of a completed transaction — a price, a rate, a tax percentage — store a copy of it <i>on that transaction</i>. Look values up live only when you want them to change. This one habit prevents a whole category of accounting bugs.</p>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-sec="The rules">
+  <p class="kick">13 · Don't store the same fact twice</p>
+  <h2>If you can work it out, work it out</h2>
+  <p class="sub">We nearly shipped a <code>trainer_batch</code> table listing which trainers work on which batch. We deleted it. Here's why.</p>
+  <div class="chain">
+    <div class="node acc"><span class="t">subject_trainer_mapping</span><span class="d">"Priya teaches JavaScript in batch 2026-27"</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Already contains</span><span class="d">the trainer AND the batch</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">So "who's on this batch?"</span><span class="d">is a question we can just ask</span></div>
+  </div>
+  <p class="note" style="margin-top:22px"><b>The danger of keeping both:</b> remove Priya from the batch list but leave her subject rows, and now the system holds two contradictory answers to one question. Whichever screen you happen to be on decides what you believe. Nothing errors — it just quietly disagrees with itself.</p>
+  <div class="c warn" style="margin-top:14px">
+    <p class="top">Rule of thumb</p>
+    <p style="color:var(--ink);font-size:clamp(13px,1.35vw,15.5px)">One fact, one place. If two tables can ever disagree, delete one of them and calculate it instead. <b>The exception is the previous slide</b> — a deliberate frozen copy for history. Know which one you're doing and why.</p>
+  </div>
+</section>
+
+<!-- 15 -->
+<section class="slide" data-sec="The screens">
+  <p class="kick">14 · From tables to screens</p>
+  <h2>23 screens, already designed and annotated</h2>
+  <p class="sub">Every wireframe lists the exact fields it reads and writes — so building a screen is mostly translation, not invention.</p>
+  <div class="cards g3">
+    <div class="c"><p class="top">Mostly generated</p><h3>Simple list + form</h3><p>Colleges, companies, positions, users, curriculum. A list, a search box, an add/edit form. Fast to build, low risk.</p></div>
+    <div class="c hl"><p class="top">Hand-built</p><h3>The clever ones</h3><p>Entrance scoring (locks until all 3 panelists are in), the timetable mapper, phone attendance, invoice generation. <b>This is where the real work is.</b></p></div>
+    <div class="c"><p class="top">Phone</p><h3>Trainer screens</h3><p>Used one-handed in a noisy classroom. Big tap targets, one decision per row, no typing where a tap will do.</p></div>
+  </div>
+  <p class="note" style="margin-top:20px"><b>A design principle we used everywhere:</b> if the database forbids something, the screen shouldn't offer it. The "Issue certificate" button is disabled below 80%. The timetable only lists trainers who actually teach that subject in that batch. <b>You can't make the mistake, so you never see the error.</b></p>
+</section>
+
+<!-- 16 -->
+<section class="slide" data-sec="The flows">
+  <p class="kick">15 · Flow A</p>
+  <h2>Entrance: from applicant to enrolled student</h2>
+  <div class="chain">
+    <div class="node"><span class="t">1. Register</span><span class="d">Candidates added, with parent details</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">2. Schedule panels</span><span class="d">One row per panelist per day</span></div>
+    <div class="tick">→</div>
+    <div class="node amb"><span class="t">3. Interviews</span><span class="d">Happens offline — paper scores</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">4. Enter scores</span><span class="d">Coordinator types in all 3 panel scores</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">5. Compute</span><span class="d">Unlocks only at 3 of 3 panels</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">6. Rank &amp; select</span><span class="d">Top N, cutoff line</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">7. Onboard</span><span class="d">Deposit, income proof, track</span></div>
+  </div>
+  <p class="note"><b>Amber = happens in the real world</b>, not in the app. Worth marking, because it's where data gets delayed or lost. Panelists interview on different days, so scores arrive piecemeal — the app saves partial rows happily, but refuses to <i>compute a total</i> until all three are in. Half a panel must never produce a ranking.</p>
+</section>
+
+<!-- 17 -->
+<section class="slide" data-sec="The flows">
+  <p class="kick">16 · Flow B — the daily one</p>
+  <h2>Running a class, and marking who came</h2>
+  <div class="chain">
+    <div class="node amb"><span class="t">College offers a slot</span><span class="d">Room + students free, Tue 9–11</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Admin records it</span><span class="d">Date, time, Lab or Classroom</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Maps a class on</span><span class="d">Pick topic + trainer</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Trainer's phone</span><span class="d">Class appears in their schedule</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Teaches, taps done</span><span class="d">Records actual start/end time</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Takes register</span><span class="d">Present / Absent / Late / Excused</span></div>
+  </div>
+  <div class="cards g2" style="margin-top:20px">
+    <div class="c"><p class="top">Why "actual" times, not planned</p><p style="color:var(--ink)">The slot said 9:00–11:00. The class ran 9:05–11:00. <b>We pay for what happened, not what was scheduled.</b> So the trainer records real times, and billing reads those.</p></div>
+    <div class="c"><p class="top">Why the register can't be half-done</p><p style="color:var(--ink)">Submit stays disabled until <b>every</b> student is marked. A partly-filled register is worse than none — it looks complete while quietly under-counting someone's attendance, which decides their certificate.</p></div>
+  </div>
+</section>
+
+<!-- 18 -->
+<section class="slide" data-sec="The flows">
+  <p class="kick">17 · Flow C — follow the money</p>
+  <h2>How a taught hour becomes a paid invoice</h2>
+  <div class="chain">
+    <div class="node"><span class="t">A class happens</span><span class="d">status = conducted, real times recorded</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">An invoice line</span><span class="d">1.92 hrs × ₹800 (rate copied) = ₹1,536</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">The invoice</span><span class="d">All June's lines, summed</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Approved &amp; paid</span><span class="d">Lines freeze — corrections become new lines</span></div>
+  </div>
+  <p class="note" style="margin-top:20px"><b>Every rupee traces back to a specific class on a specific day.</b> If Priya questions her invoice, we show her the exact sessions on it. That's why line items exist at all — the original design just had a total, which is impossible to defend or debug.</p>
+  <div class="cards g2" style="margin-top:14px">
+    <div class="c"><p class="top">Two kinds of payee, one system</p><p style="color:var(--ink)">Trainers bill for classes; panel members bill for interview sittings. Same invoice tables. A rule guarantees each invoice has <b>exactly one</b> payee — never zero, never both.</p></div>
+    <div class="c"><p class="top">Attendance never affects pay</p><p style="color:var(--ink)">A trainer is paid for teaching, whether 30 students came or 4. The attendance chain and the money chain are deliberately kept apart.</p></div>
+  </div>
+</section>
+
+<!-- 19 -->
+<section class="slide" data-sec="Building it">
+  <p class="kick">18 · How we'll build</p>
+  <h2>Thin slices, not layers</h2>
+  <p class="sub">The instinct is to build all the tables, then all the screens, then all the logic. Don't. <b>Build one complete journey at a time</b> — each slice is demoable and actually usable.</p>
+  <div class="chain">
+    <div class="node acc"><span class="t">Slice 0</span><span class="d">All 28 tables + every rule. One focused effort.</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Slice 1</span><span class="d">College → batch → weights. Proves login &amp; roles.</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Slice 2</span><span class="d">Entrance → selection → onboarding</span></div>
+    <div class="tick">→</div>
+    <div class="node acc"><span class="t">Slice 3</span><span class="d">Curriculum, timetable, attendance. <b>Now it's usable daily.</b></span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Slice 4</span><span class="d">Billing &amp; certificates — needed monthly, not daily</span></div>
+    <div class="tick">→</div>
+    <div class="node"><span class="t">Slice 5</span><span class="d">Placement — furthest away in time</span></div>
+  </div>
+  <p class="note"><b>Why this order:</b> it follows the student's journey, so each slice is something real you can show a coordinator and get corrections on early. Billing can wait — the first invoice isn't due until a month after teaching starts. Placement can wait a year.</p>
+</section>
+
+<!-- 20 -->
+<section class="slide" data-sec="Building it">
+  <p class="kick">19 · Still open</p>
+  <h2>Three decisions we need before writing tables</h2>
+  <p class="sub">Everything else is settled. These three change the schema, and schema changes are cheapest <b>before</b> there's data in it.</p>
+  <div class="qlist">
+    <div class="q"><span class="qn">QUESTION 4</span><p><b>Does the Zoho vs non-Zoho track change what's taught?</b> Right now nothing connects a student's track to a set of subjects. If the two tracks study different things, we need another link — and the timetable must filter by it.</p></div>
+    <div class="q"><span class="qn">QUESTION 7</span><p><b>Does the system generate certificate PDFs, or just record that one was issued?</b> We store a template link but have nowhere to put the finished certificate. If we generate, we need a column for the output file.</p></div>
+    <div class="q"><span class="qn">QUESTION 10</span><p><b>What happens to the deposit if a student drops out?</b> Refunds are defined for students who complete. Dropouts are undefined — and dropouts are exactly when someone will ask for their money back.</p></div>
+  </div>
+  <p class="note">There are ten open questions in total; the other seven affect screens, not tables, so they can be answered while building.</p>
+</section>
+
+<!-- 21 -->
+<section class="slide" data-sec="Wrap up">
+  <p class="kick">20 · Take these away</p>
+  <h1>Five things to remember</h1>
+  <div class="cards g2">
+    <div class="c hl"><h3>1 · Nouns become tables</h3><p>Including events — "a class happened", "a student was present", "an invoice was raised".</p></div>
+    <div class="c hl"><h3>2 · The many side holds the link</h3><p>And when both sides are "many", you need a table in the middle.</p></div>
+    <div class="c hl"><h3>3 · Let the database say no</h3><p>Rules on the table hold no matter how the data arrives. App checks are for friendly messages.</p></div>
+    <div class="c hl"><h3>4 · Freeze money, calculate the rest</h3><p>Copy rates onto invoices. Everything else, work out from one source of truth.</p></div>
+    <div class="c hl"><h3>5 · Never delete — deactivate</h3><p>History has to stay standing, or your past stops making sense.</p></div>
+    <div class="c"><p class="top">Where everything lives</p><h3>The repo</h3><p><code>APP-Data-Structure-Detailed.md</code> — all 28 tables, every field explained.<br><code>APP-Wireframes-Storyboards.html</code> — 23 screens, 10 flows.</p></div>
+  </div>
+  <p class="note">Questions now — and if something in the schema looks wrong to you, <b>say so.</b> Six real bugs were caught by exactly that kind of second look.</p>
+</section>
+
+</div>
+
+<div class="prog" id="prog"></div>
+<div class="bar">
+  <span class="lbl" id="secl">Start here</span>
+  <span class="sp"></span>
+  <button class="nb" id="prev" aria-label="Previous slide">←</button>
+  <span class="cnt" id="cnt">1 / 21</span>
+  <button class="nb" id="next" aria-label="Next slide">→</button>
+</div>
+
+<script>
+(function(){
+  var s = Array.prototype.slice.call(document.querySelectorAll('.slide')),
+      i = 0, n = s.length,
+      cnt = document.getElementById('cnt'),
+      secl = document.getElementById('secl'),
+      prog = document.getElementById('prog'),
+      prev = document.getElementById('prev'),
+      next = document.getElementById('next');
+
+  function show(k){
+    i = Math.max(0, Math.min(n - 1, k));
+    s.forEach(function(el, j){ el.classList.toggle('on', j === i); });
+    cnt.textContent = (i + 1) + ' / ' + n;
+    secl.textContent = s[i].getAttribute('data-sec') || '';
+    prog.style.width = ((i + 1) / n * 100) + '%';
+    prev.disabled = (i === 0);
+    next.disabled = (i === n - 1);
+    window.scrollTo(0, 0);
+  }
+  prev.addEventListener('click', function(){ show(i - 1); });
+  next.addEventListener('click', function(){ show(i + 1); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i + 1); e.preventDefault(); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); e.preventDefault(); }
+    else if(e.key === 'Home') { show(0); }
+    else if(e.key === 'End') { show(n - 1); }
+  });
+  show(0);
+})();
+</script>
