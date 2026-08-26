@@ -1,0 +1,1668 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MyPrayers</title>
+<meta name="description" content="A community prayer counter. Open a topic, address whichever divine you hold, and count your prayers alongside everyone else's.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Karla:ital,wght@0,300..800;1,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* ============================================================
+   MyPrayers — a community prayer counter
+   Design: limewash & verdigris ground, brass accent, a mala of
+   beads as the counting instrument. Marcellus (titling) /
+   Karla (interface) / IBM Plex Mono (tallies).
+   ============================================================ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ground:#EBEEE8;
+  --ground-edge:#DFE3DA;
+  --surface:#F8F9F4;
+  --raised:#FFFFFF;
+  --sunk:#E7EAE2;
+  --line:#D5DACE;
+  --line-soft:#E3E6DE;
+  --text:#171C1A;
+  --text-2:#586259;
+  --text-3:#8B948C;
+  --brass:#8E6511;
+  --brass-bright:#B98A1F;
+  --brass-wash:#F0E6CB;
+  --verd:#1D5F53;
+  --verd-wash:#DDE8E3;
+  --danger:#9C3A2E;
+  --shadow-sm:0 1px 2px rgba(20,32,26,.07);
+  --shadow-md:0 2px 4px rgba(20,32,26,.05),0 12px 28px -16px rgba(20,32,26,.28);
+  --shadow-lg:0 4px 8px rgba(20,32,26,.06),0 40px 70px -40px rgba(20,32,26,.45);
+  --lift-col:#000;
+  --lift:0%;
+  --bead-off:#CFD5CA;
+  --scrim:rgba(23,28,26,.42);
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0B0F0E;
+    --ground-edge:#060908;
+    --surface:#141917;
+    --raised:#1B211F;
+    --sunk:#101514;
+    --line:#2A322F;
+    --line-soft:#212826;
+    --text:#E8EEEA;
+    --text-2:#9DA9A3;
+    --text-3:#6F7D77;
+    --brass:#E0B054;
+    --brass-bright:#F0C876;
+    --brass-wash:#31280F;
+    --verd:#5FB6A1;
+    --verd-wash:#152A26;
+    --danger:#DE7A6A;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    --shadow-md:0 2px 4px rgba(0,0,0,.3),0 12px 28px -16px rgba(0,0,0,.8);
+    --shadow-lg:0 4px 8px rgba(0,0,0,.35),0 40px 70px -40px rgba(0,0,0,1);
+    --lift-col:#fff;
+    --lift:24%;
+    --bead-off:#2E3733;
+    --scrim:rgba(0,0,0,.6);
+  }
+}
+
+:root[data-theme="dark"]{
+  --ground:#0B0F0E;
+  --ground-edge:#060908;
+  --surface:#141917;
+  --raised:#1B211F;
+  --sunk:#101514;
+  --line:#2A322F;
+  --line-soft:#212826;
+  --text:#E8EEEA;
+  --text-2:#9DA9A3;
+  --text-3:#6F7D77;
+  --brass:#E0B054;
+  --brass-bright:#F0C876;
+  --brass-wash:#31280F;
+  --verd:#5FB6A1;
+  --verd-wash:#152A26;
+  --danger:#DE7A6A;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  --shadow-md:0 2px 4px rgba(0,0,0,.3),0 12px 28px -16px rgba(0,0,0,.8);
+  --shadow-lg:0 4px 8px rgba(0,0,0,.35),0 40px 70px -40px rgba(0,0,0,1);
+  --lift-col:#fff;
+  --lift:24%;
+  --bead-off:#2E3733;
+  --scrim:rgba(0,0,0,.6);
+}
+
+html{-webkit-text-size-adjust:100%}
+
+body{
+  font-family:"Karla","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  color:var(--text);
+  background:var(--ground);
+  background-image:radial-gradient(120% 90% at 50% 0%,var(--ground) 0%,var(--ground-edge) 100%);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* faith colour helper: one hex per tradition, lifted in dark mode */
+.f{color:color-mix(in srgb,var(--f),var(--lift-col) var(--lift))}
+.fbg{background:color-mix(in srgb,var(--f),var(--lift-col) var(--lift))}
+
+/* ---------- shell ---------- */
+
+#app{
+  min-height:100vh;min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;
+}
+.device{
+  position:relative;
+  width:100%;max-width:444px;
+  /* a fixed height keeps the tab bar planted and lets .screen do the scrolling */
+  height:100vh;height:100dvh;
+  background:var(--surface);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+@media (min-width:780px){
+  #app{padding:28px 20px}
+  .device{
+    height:min(898px,calc(100dvh - 56px));
+    border-radius:34px;
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-lg);
+  }
+}
+
+.screen{
+  flex:1 1 auto;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.pad{padding:0 20px}
+.stack{display:flex;flex-direction:column}
+
+/* ---------- type ---------- */
+
+.display{font-family:"Marcellus",Georgia,"Times New Roman",serif;font-weight:400;letter-spacing:.004em;text-wrap:balance}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10.5px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--text-3);
+}
+.num{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.muted{color:var(--text-2)}
+.faint{color:var(--text-3)}
+
+/* ---------- controls ---------- */
+
+button,input,textarea,select{font:inherit;color:inherit}
+button{background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--brass);outline-offset:2px;border-radius:6px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:46px;padding:0 20px;border-radius:23px;
+  font-weight:600;font-size:14.5px;letter-spacing:.01em;
+  border:1px solid transparent;
+  transition:transform .12s ease,background .16s ease,border-color .16s ease;
+}
+.btn:active{transform:scale(.975)}
+.btn-primary{background:var(--text);color:var(--surface)}
+.btn-ghost{border-color:var(--line);color:var(--text)}
+.btn-ghost:hover{background:var(--sunk)}
+.btn-block{width:100%}
+.btn:disabled{opacity:.42;cursor:not-allowed}
+
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:13px;font-weight:600;color:var(--text-2)}
+.hint{font-size:12.5px;line-height:1.55;color:var(--text-3)}
+.input,.textarea,.select{
+  width:100%;background:var(--raised);border:1px solid var(--line);
+  border-radius:12px;padding:12px 13px;font-size:15px;
+  transition:border-color .16s ease,box-shadow .16s ease;
+}
+.textarea{resize:vertical;min-height:92px;line-height:1.45}
+.input:focus,.textarea:focus,.select:focus{
+  outline:none;border-color:var(--brass);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--brass) 18%,transparent);
+}
+.input::placeholder,.textarea::placeholder{color:var(--text-3)}
+.select{appearance:none;padding-right:34px;
+  background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),linear-gradient(135deg,var(--text-3) 50%,transparent 50%);
+  background-position:calc(100% - 17px) 21px,calc(100% - 12px) 21px;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+}
+
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  height:32px;padding:0 12px;border-radius:16px;
+  border:1px solid var(--line);background:var(--raised);
+  font-size:13px;font-weight:500;color:var(--text-2);
+  transition:border-color .14s ease,background .14s ease,color .14s ease;
+}
+.chip:hover{border-color:var(--text-3)}
+.chip[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:var(--surface)}
+
+/* ---------- top bar ---------- */
+
+.topbar{
+  flex:0 0 auto;
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px 12px;
+  border-bottom:1px solid var(--line-soft);
+  background:var(--surface);
+  position:relative;z-index:3;
+}
+.topbar h1{font-size:19px;line-height:1.2}
+.topbar .sub{font-size:12px;color:var(--text-3);margin-top:1px}
+.topbar .grow{flex:1;min-width:0}
+.topbar .grow h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{
+  flex:0 0 auto;
+  width:36px;height:36px;border-radius:18px;
+  display:grid;place-items:center;color:var(--text-2);
+  border:1px solid transparent;
+}
+.iconbtn:hover{background:var(--sunk);color:var(--text)}
+.iconbtn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- tab bar ---------- */
+
+.tabbar{
+  flex:0 0 auto;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--line-soft);
+  background:var(--surface);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tab{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:9px 0 10px;color:var(--text-3);
+  font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  transition:color .14s ease;
+}
+.tab svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tab[aria-current="page"]{color:var(--text)}
+.tab:hover{color:var(--text-2)}
+
+/* ---------- topic cards ---------- */
+
+.cards{display:flex;flex-direction:column;gap:12px;padding:16px 20px 26px}
+.card{
+  display:block;width:100%;text-align:left;
+  background:var(--raised);border:1px solid var(--line-soft);
+  border-radius:16px;padding:15px 16px 13px;
+  box-shadow:var(--shadow-sm);
+  transition:transform .14s ease,box-shadow .16s ease,border-color .16s ease;
+}
+.card:hover{transform:translateY(-1px);box-shadow:var(--shadow-md);border-color:var(--line)}
+.card:active{transform:translateY(0)}
+.card-head{display:flex;align-items:flex-start;gap:12px}
+.card-head .grow{flex:1;min-width:0}
+.card h2{font-size:17.5px;line-height:1.25}
+.card .place{font-size:12.5px;color:var(--text-3);margin-top:3px}
+.card .need{font-size:13.5px;color:var(--text-2);line-height:1.45;margin-top:8px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-tally{flex:0 0 auto;text-align:right}
+.card-tally .n{display:block;font-size:19px;font-weight:600;line-height:1.1}
+.card-tally .l{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-top:2px}
+.card-foot{display:flex;align-items:center;gap:10px;margin-top:12px}
+.card-foot .meta{font-size:12px;color:var(--text-3);white-space:nowrap}
+.yours{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11.5px;font-weight:600;color:var(--brass);
+  background:var(--brass-wash);border-radius:11px;padding:2px 8px;
+}
+
+/* stacked faith mix bar */
+.mix{display:flex;height:5px;border-radius:3px;overflow:hidden;background:var(--sunk);gap:1.5px}
+.mix span{display:block;min-width:2px}
+.mix.tall{height:9px;border-radius:5px;gap:2px}
+
+/* ---------- category tag ---------- */
+.tag{
+  display:inline-flex;align-items:center;
+  height:20px;padding:0 8px;border-radius:4px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:9.5px;font-weight:500;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--verd);background:var(--verd-wash);
+}
+
+/* ---------- prayer stage ---------- */
+
+.stage{display:flex;flex-direction:column;align-items:center;padding:18px 20px 6px}
+.total{display:flex;flex-direction:column;align-items:center;gap:2px}
+.total .n{font-size:40px;font-weight:500;line-height:1;transition:transform .1s ease}
+.total .n.bump{transform:scale(1.045)}
+.total .l{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--text-3)}
+
+.mala{position:relative;width:min(304px,80vw);aspect-ratio:1;margin:10px 0 2px;touch-action:manipulation}
+.mala svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.mala .bead{fill:var(--bead-off);transition:fill .18s ease,r .18s ease}
+.mala .bead.lit{fill:var(--brass-bright)}
+.mala .bead.head{fill:none;stroke:var(--brass);stroke-width:1.4}
+.mala .track{fill:none;stroke:var(--line-soft);stroke-width:1}
+
+.pray{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:57%;aspect-ratio:1;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  background:var(--raised);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow-md);
+  transition:transform .09s cubic-bezier(.2,.8,.3,1),box-shadow .12s ease;
+  user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+}
+.pray:hover{box-shadow:var(--shadow-lg)}
+.pray.down{transform:translate(-50%,-50%) scale(.945);box-shadow:var(--shadow-sm)}
+.pray .glyph{font-size:30px;line-height:1;color:color-mix(in srgb,var(--f,#8E6511),var(--lift-col) var(--lift))}
+.pray .word{font-family:"Marcellus",Georgia,serif;font-size:20px;letter-spacing:.02em}
+.pray .to{font-size:11px;color:var(--text-3);max-width:80%;text-align:center;line-height:1.25}
+
+.ripple{
+  position:absolute;left:50%;top:50%;width:57%;aspect-ratio:1;border-radius:50%;
+  transform:translate(-50%,-50%);pointer-events:none;
+  border:1.5px solid var(--brass);opacity:0;
+}
+.ripple.go{animation:ripple .72s ease-out}
+@keyframes ripple{
+  0%{opacity:.7;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.72)}
+}
+
+.motes{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.mote{
+  position:absolute;left:50%;top:34%;
+  font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;
+  color:var(--brass);opacity:0;
+  animation:mote 900ms cubic-bezier(.25,.6,.3,1) forwards;
+}
+@keyframes mote{
+  0%{opacity:0;transform:translate(-50%,0) scale(.7)}
+  18%{opacity:1}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),-96px) scale(1)}
+}
+
+.roundline{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:12px;color:var(--text-3);margin-top:6px;
+}
+.roundline b{color:var(--text-2);font-weight:600}
+
+.asrow{
+  display:flex;align-items:center;gap:8px;
+  margin:14px 0 2px;padding:7px 8px 7px 12px;
+  border:1px solid var(--line);border-radius:20px;background:var(--raised);
+  font-size:13px;
+}
+.asrow .g{font-size:15px;line-height:1}
+.asrow .who{font-weight:600}
+.asrow .sw{margin-left:auto;font-size:11.5px;font-weight:600;color:var(--brass);padding:3px 9px;border-radius:12px;background:var(--brass-wash)}
+
+/* ---------- sections ---------- */
+
+.section{padding:20px 20px 0}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:11px}
+.section-head h3{font-family:"Marcellus",Georgia,serif;font-size:15.5px;font-weight:400;letter-spacing:.01em}
+
+.legend{display:flex;flex-direction:column;gap:1px;margin-top:11px}
+.legend-row{display:flex;align-items:center;gap:9px;padding:6px 0;border-bottom:1px solid var(--line-soft)}
+.legend-row:last-child{border-bottom:0}
+.dot{flex:0 0 auto;width:9px;height:9px;border-radius:50%}
+.legend-row .nm{flex:1;min-width:0;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend-row .ct{font-size:13px;font-weight:600}
+.legend-row .pc{font-size:11.5px;color:var(--text-3);width:38px;text-align:right}
+
+.people{display:flex;flex-direction:column;gap:1px}
+.person{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-soft)}
+.person:last-child{border-bottom:0}
+.person.me{background:var(--brass-wash);border-radius:10px;padding:8px 10px;border-bottom:0;margin:2px -10px}
+.av{
+  flex:0 0 auto;width:30px;height:30px;border-radius:50%;
+  display:grid;place-items:center;font-size:14px;line-height:1;
+  color:#fff;
+}
+.person .who{flex:1;min-width:0}
+.person .who .n{display:block;font-size:13.5px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person .who .d{display:block;font-size:11.5px;color:var(--text-3);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.person .ct{font-size:13.5px;font-weight:600}
+
+.feed{display:flex;flex-direction:column}
+.feed-item{
+  display:flex;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--line-soft);
+  animation:fadein .4s ease both;
+}
+.feed-item:last-child{border-bottom:0}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.feed-item .g{flex:0 0 auto;width:22px;text-align:center;font-size:14px;line-height:1.4}
+.feed-item .tx{flex:1;min-width:0;font-size:13px;line-height:1.45;color:var(--text-2)}
+.feed-item .tx b{color:var(--text);font-weight:600}
+.feed-item .t{flex:0 0 auto;font-size:11px;color:var(--text-3);white-space:nowrap}
+
+.note{
+  margin:22px 20px 26px;padding:13px 15px;
+  border-left:2px solid var(--brass);
+  background:var(--sunk);border-radius:0 10px 10px 0;
+  font-size:12.5px;line-height:1.55;color:var(--text-2);
+}
+
+/* ---------- stats ---------- */
+
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--raised);border:1px solid var(--line-soft);border-radius:14px;padding:13px 14px}
+.stat .n{font-size:25px;font-weight:500;line-height:1.05}
+.stat .l{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--text-3);margin-top:4px}
+
+/* ---------- sheet ---------- */
+
+.sheet-scrim{
+  position:absolute;inset:0;z-index:10;background:var(--scrim);
+  opacity:0;pointer-events:none;transition:opacity .22s ease;
+  display:flex;align-items:flex-end;
+}
+.sheet-scrim.open{opacity:1;pointer-events:auto}
+.sheet{
+  width:100%;max-height:86%;
+  background:var(--surface);
+  border-radius:22px 22px 0 0;border-top:1px solid var(--line);
+  display:flex;flex-direction:column;
+  transform:translateY(100%);transition:transform .26s cubic-bezier(.3,.9,.35,1);
+}
+.sheet-scrim.open .sheet{transform:none}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--line-soft)}
+.sheet-head h3{flex:1;font-family:"Marcellus",Georgia,serif;font-weight:400;font-size:17px}
+.sheet-body{overflow-y:auto;padding:14px 18px 26px}
+
+.tradlist{display:flex;flex-direction:column;gap:2px}
+.tradgroup{
+  display:flex;align-items:center;gap:8px;
+  margin:14px 0 4px;padding-top:12px;border-top:1px solid var(--line-soft);
+}
+.tradgroup:first-child{margin-top:0;padding-top:0;border-top:0}
+.tradgroup .g{font-size:13px;line-height:1}
+.tradgroup .n{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--text-3);
+}
+.tradgroup .rule{flex:1;height:1px;background:var(--line-soft)}
+.trad{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  padding:9px 10px;border-radius:11px;border:1px solid transparent;
+  transition:background .14s ease;
+}
+.trad:hover{background:var(--sunk)}
+.trad[aria-pressed="true"]{border-color:var(--brass);background:var(--brass-wash)}
+.trad .g{flex:0 0 auto;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:15px;color:#fff}
+.trad .nm{flex:1;min-width:0}
+.trad .nm .a{display:block;font-size:14px;font-weight:600;line-height:1.3}
+.trad .nm .b{display:block;font-size:11.5px;color:var(--text-3);line-height:1.35}
+
+/* ---------- onboarding ---------- */
+
+.onboard{display:flex;flex-direction:column;min-height:100%;padding:0 24px 24px}
+.onboard .hero{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:38px 0 24px;gap:14px}
+.onboard .mark{width:54px;height:54px;color:var(--brass)}
+.onboard .mark circle{fill:currentColor}
+.onboard .mark circle.dim{fill:var(--bead-off)}
+.onboard h1{font-size:33px;line-height:1.08}
+.onboard .lede{font-size:14.5px;line-height:1.6;color:var(--text-2);max-width:31ch}
+.step{display:flex;flex-direction:column;gap:16px}
+
+.toast{
+  position:absolute;left:50%;bottom:76px;transform:translate(-50%,10px);
+  z-index:20;padding:9px 15px;border-radius:20px;
+  background:var(--text);color:var(--surface);
+  font-size:13px;font-weight:600;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;
+  box-shadow:var(--shadow-md);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.empty{padding:52px 24px;text-align:center;color:var(--text-3);font-size:14px;line-height:1.6}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="device">
+    <div id="chrome"></div>
+    <div class="screen" id="screen"></div>
+    <nav class="tabbar" id="tabbar" hidden></nav>
+    <div class="sheet-scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   1. Traditions — what a person may address a prayer to.
+   Order is alphabetical after the founder's note: no tradition
+   is ranked, and the app never sorts people by faith.
+   ============================================================ */
+
+var TRADITIONS = [
+  {id:"bahai",       name:"Bahá'í",              mark:"✹", color:"#B24C86", deities:["God","The Báb","Bahá'u'lláh"]},
+  {id:"buddhist",    name:"Buddhism",            mark:"☸", color:"#C0533F", deities:["The Buddha","Avalokiteshvara","Green Tara","Amitabha"]},
+  {id:"christian",   name:"Christianity",        mark:"✝", color:"#5468B8", deities:["God the Father","Jesus Christ","The Holy Spirit","Mother Mary","St. Jude"]},
+  {id:"earth",       name:"Earth traditions",    mark:"☉", color:"#7C6A45", deities:["The Great Spirit","Pachamama","The Ancestors"]},
+  {id:"hindu",       name:"Hinduism",            mark:"ॐ", color:"#D06A2C", deities:["Ganesha","Shiva","Vishnu","Durga","Krishna","Hanuman","Lakshmi","Saraswati","Murugan"]},
+  {id:"humanist",    name:"Humanist",            mark:"◯", color:"#79837F", deities:["A moment of intention"]},
+  {id:"jain",        name:"Jainism",             mark:"◈", color:"#8B9C33", deities:["Mahavira","The Tirthankaras"]},
+  {id:"jewish",      name:"Judaism",             mark:"✡", color:"#3C8FB5", deities:["HaShem"]},
+  {id:"muslim",      name:"Islam",               mark:"☪", color:"#2E8267", deities:["Allah"]},
+  {id:"shinto",      name:"Shinto",              mark:"⛩", color:"#A85A73", deities:["The Kami","Amaterasu","Inari"]},
+  {id:"sikh",        name:"Sikhism",             mark:"☬", color:"#8A5BB0", deities:["Waheguru"]},
+  {id:"universe",    name:"Spiritual",           mark:"✧", color:"#5C8C9C", deities:["The Universe","The Light","Whatever is listening"]},
+  {id:"zoroastrian", name:"Zoroastrianism",      mark:"✷", color:"#C99A1F", deities:["Ahura Mazda"]}
+];
+var TRAD = {};
+TRADITIONS.forEach(function(t){ TRAD[t.id] = t; });
+
+var CATEGORIES = ["Disaster","Health","Peace","Nature","Community","Gratitude"];
+
+var BEADS_PER_ROUND = 27;   /* one quarter of a 108-bead mala */
+var ROUNDS_PER_MALA = 4;
+
+/* ============================================================
+   2. Seed community — the people already praying when you arrive
+   ============================================================ */
+
+var POOL = [
+  ["Aarav Sharma","hindu","Ganesha"],      ["Fatima Sheikh","muslim","Allah"],
+  ["Grace Mendes","christian","Jesus Christ"], ["Harpreet Singh","sikh","Waheguru"],
+  ["Tenzin Dolma","buddhist","Green Tara"],["Ruth Cohen","jewish","HaShem"],
+  ["Nirali Shah","jain","Mahavira"],       ["Farhad Irani","zoroastrian","Ahura Mazda"],
+  ["Nadia Rahimi","bahai","God"],          ["Kenji Mori","shinto","The Kami"],
+  ["Rosa Quispe","earth","Pachamama"],     ["Elena Duarte","universe","The Universe"],
+  ["Sam Okafor","humanist","A moment of intention"], ["Priya Nair","hindu","Durga"],
+  ["Yusuf Ali","muslim","Allah"],          ["Maria Fernandes","christian","Mother Mary"],
+  ["Anand Iyer","hindu","Shiva"],          ["Sofia Lindqvist","universe","The Light"],
+  ["Daniel Kim","christian","God the Father"], ["Meena Kumari","hindu","Hanuman"],
+  ["Ibrahim Musa","muslim","Allah"],       ["Jasleen Kaur","sikh","Waheguru"],
+  ["Thandiwe Moyo","earth","The Ancestors"],["Leah Abramov","jewish","HaShem"],
+  ["Wei Chen","buddhist","Amitabha"],      ["Ana Beatriz Silva","christian","St. Jude"]
+];
+
+var SEEDS = [
+  {id:"nepal-floods", title:"Floods in Nepal", place:"Koshi & Bagmati river basins",
+   category:"Disaster", started:3, participants:1284, scale:74,
+   need:"For everyone displaced by the Koshi floods — dry shelter tonight, clean water tomorrow, and safe footing for the rescue crews still working the banks."},
+  {id:"meera", title:"Strength for Meera, age 7", place:"Kochi, Kerala",
+   category:"Health", started:6, participants:412, scale:23,
+   need:"Meera goes in for heart surgery on Friday morning. Her family has asked that we hold her, her surgeons, and her mother in whatever way we each know how."},
+  {id:"marathwada", title:"Rain for the farmers of Marathwada", place:"Maharashtra",
+   category:"Nature", started:11, participants:678, scale:41,
+   need:"A fourth dry season would break the district. We are praying for rain that arrives gently, and for the courage of the families waiting on it."},
+  {id:"kanyakumari", title:"Safe passage for the fishers of Kanyakumari", place:"Tamil Nadu coast",
+   category:"Community", started:2, participants:296, scale:16,
+   need:"Nineteen boats went out before the warning was raised. For steady seas, working radios, and every one of them home."},
+  {id:"quiet-homes", title:"A quiet home this festival season", place:"Everywhere",
+   category:"Peace", started:9, participants:903, scale:52,
+   need:"For the households where the holidays are hardest — that the noise stays outside the door, and the people inside are kind to one another."}
+];
+
+/* deterministic pseudo-random so the seeded community is stable */
+function lcg(seed){ var s = seed >>> 0; return function(){ s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+function hashStr(s){ var h = 2166136261; for (var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+/* ============================================================
+   3. State
+   ============================================================ */
+
+var STORE_KEY = "myprayers.v1";
+var state = null;
+var view = {name:"topics", topicId:null};
+var saveTimer = null;
+
+function nowMs(){ return Date.now(); }
+function daysAgoMs(d){ return nowMs() - d * 86400000; }
+
+function buildTopic(seed){
+  var rnd = lcg(hashStr(seed.id));
+  var people = [];
+  var tally = {};
+  var pool = POOL.slice();
+  /* pick a stable subset of the pool as this topic's visible contributors */
+  var take = 9 + Math.floor(rnd() * 6);
+  for (var i = 0; i < take && pool.length; i++){
+    var p = pool.splice(Math.floor(rnd() * pool.length), 1)[0];
+    var count = Math.round((8 + rnd() * 240) * (seed.scale / 40));
+    people.push({name:p[0], tradition:p[1], deity:p[2], count:count});
+    tally[p[1]] = (tally[p[1]] || 0) + count;
+  }
+  /* the rest of the crowd, folded into the faith tally but not listed.
+     Weighted on a long tail so a topic reads like a real gathering —
+     two or three traditions carrying it, a scattering of others. */
+  TRADITIONS.forEach(function(t){
+    var extra = Math.round(Math.pow(rnd(), 2.6) * 1900 * (seed.scale / 40));
+    if (extra > 0) tally[t.id] = (tally[t.id] || 0) + extra;
+  });
+  /* a few backdated entries so a topic never opens looking abandoned */
+  var feed = [];
+  for (var j = 0; j < 6 && people.length; j++){
+    var who = people[Math.floor(rnd() * people.length)];
+    feed.push({
+      name:who.name, tradition:who.tradition, deity:who.deity,
+      n:1 + Math.floor(rnd() * 18),
+      t:nowMs() - Math.round((60 + rnd() * 5400) * 1000 * (j + 1))
+    });
+  }
+  feed.sort(function(a,b){ return b.t - a.t; });
+
+  return {
+    id:seed.id, title:seed.title, place:seed.place, category:seed.category,
+    need:seed.need, participants:seed.participants, created:daysAgoMs(seed.started),
+    mine:0, people:people, tally:tally, feed:feed, author:null
+  };
+}
+
+function freshState(){
+  return {
+    me:{name:"", tradition:"hindu", deity:"Ganesha", joined:nowMs(), days:[todayKey()]},
+    onboarded:false,
+    topics:SEEDS.map(buildTopic),
+    total:0
+  };
+}
+
+function todayKey(){ var d = new Date(); return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+
+function load(){
+  try {
+    var raw = localStorage.getItem(STORE_KEY);
+    if (raw){
+      var parsed = JSON.parse(raw);
+      if (parsed && parsed.topics && parsed.me) return parsed;
+    }
+  } catch (e){ /* private mode, blocked storage — run from memory */ }
+  return freshState();
+}
+
+function save(){
+  if (saveTimer) return;
+  saveTimer = setTimeout(function(){
+    saveTimer = null;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e){ /* nothing to do */ }
+  }, 400);
+}
+
+function topicById(id){
+  for (var i=0;i<state.topics.length;i++) if (state.topics[i].id === id) return state.topics[i];
+  return null;
+}
+function topicTotal(t){
+  var n = 0;
+  for (var k in t.tally) if (Object.prototype.hasOwnProperty.call(t.tally,k)) n += t.tally[k];
+  return n;
+}
+function myTradition(){ return TRAD[state.me.tradition] || TRADITIONS[4]; }
+
+/* ============================================================
+   4. Small helpers
+   ============================================================ */
+
+function el(tag, cls, text){
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+function fmt(n){ return Number(n).toLocaleString("en-US"); }
+function initials(name){
+  var parts = String(name).trim().split(/\s+/);
+  return (parts[0][0] + (parts[1] ? parts[1][0] : "")).toUpperCase();
+}
+function ago(ms){
+  var s = Math.max(1, Math.round((nowMs() - ms) / 1000));
+  if (s < 45) return "just now";
+  if (s < 3600) return Math.round(s/60) + "m ago";
+  if (s < 86400) return Math.round(s/3600) + "h ago";
+  return Math.round(s/86400) + "d ago";
+}
+function faithStyle(node, color){ node.style.setProperty("--f", color); return node; }
+
+var toastTimer = null;
+function toast(msg){
+  var t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+}
+
+function icon(paths){
+  var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 24 24");
+  svg.setAttribute("aria-hidden","true");
+  paths.forEach(function(d){
+    var p = document.createElementNS("http://www.w3.org/2000/svg","path");
+    p.setAttribute("d", d);
+    svg.appendChild(p);
+  });
+  return svg;
+}
+var ICONS = {
+  back:["M15 18l-6-6 6-6"],
+  topics:["M4 6h16","M4 12h16","M4 18h10"],
+  create:["M12 5v14","M5 12h14"],
+  you:["M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2","M12 3a4 4 0 1 1 0 8 4 4 0 0 1 0-8"],
+  close:["M18 6L6 18","M6 6l12 12"]
+};
+
+/* stacked faith-mix bar */
+function mixBar(tally, tall){
+  var bar = el("div","mix" + (tall ? " tall" : ""));
+  var rows = tallyRows(tally);
+  var total = rows.reduce(function(a,r){ return a + r.count; }, 0) || 1;
+  rows.forEach(function(r){
+    var s = el("span");
+    s.style.width = (r.count / total * 100) + "%";
+    s.style.setProperty("--f", r.trad.color);
+    s.className = "fbg";
+    s.title = r.trad.name + " · " + fmt(r.count);
+    bar.appendChild(s);
+  });
+  return bar;
+}
+function tallyRows(tally){
+  var rows = [];
+  for (var k in tally){
+    if (!Object.prototype.hasOwnProperty.call(tally,k) || !TRAD[k] || tally[k] <= 0) continue;
+    rows.push({trad:TRAD[k], count:tally[k]});
+  }
+  rows.sort(function(a,b){ return b.count - a.count; });
+  return rows;
+}
+
+/* ============================================================
+   5. Chrome — top bar and tab bar
+   ============================================================ */
+
+function renderChrome(){
+  var chrome = document.getElementById("chrome");
+  var tabbar = document.getElementById("tabbar");
+  chrome.textContent = "";
+  tabbar.textContent = "";
+
+  if (!state.onboarded){ tabbar.hidden = true; return; }
+  tabbar.hidden = false;
+
+  var bar = el("div","topbar");
+
+  if (view.name === "topic"){
+    var back = el("button","iconbtn");
+    back.type = "button";
+    back.setAttribute("aria-label","Back to topics");
+    back.appendChild(icon(ICONS.back));
+    back.addEventListener("click", function(){ go("topics"); });
+    bar.appendChild(back);
+
+    var t = topicById(view.topicId);
+    var grow = el("div","grow");
+    var h = el("h1","display", t ? t.title : "Topic");
+    grow.appendChild(h);
+    if (t) grow.appendChild(el("div","sub", fmt(t.participants) + " people praying · " + t.category.toLowerCase()));
+    bar.appendChild(grow);
+  } else {
+    var titles = {topics:"MyPrayers", create:"New topic", you:"You"};
+    var subs = {
+      topics:"Pray together, count together",
+      create:"Open something for the world to hold",
+      you:"Your own tally"
+    };
+    var g2 = el("div","grow");
+    g2.appendChild(el("h1","display", titles[view.name] || "MyPrayers"));
+    g2.appendChild(el("div","sub", subs[view.name] || ""));
+    bar.appendChild(g2);
+  }
+  chrome.appendChild(bar);
+
+  [["topics","Topics"],["create","New"],["you","You"]].forEach(function(pair){
+    var b = el("button","tab");
+    b.type = "button";
+    b.appendChild(icon(ICONS[pair[0]]));
+    b.appendChild(el("span", null, pair[1]));
+    if (view.name === pair[0] || (pair[0] === "topics" && view.name === "topic")) b.setAttribute("aria-current","page");
+    b.addEventListener("click", function(){ go(pair[0]); });
+    tabbar.appendChild(b);
+  });
+}
+
+/* ============================================================
+   6. Onboarding
+   ============================================================ */
+
+function renderOnboard(root){
+  var wrap = el("div","onboard");
+  var hero = el("div","hero");
+  hero.appendChild(appMark());
+  var h1 = el("h1","display","MyPrayers");
+  hero.appendChild(h1);
+  hero.appendChild(el("p","lede","Someone opens a topic. Everyone else prays for it — each to whichever divine they hold. Every prayer is counted, yours and the world's."));
+  wrap.appendChild(hero);
+
+  var step = el("div","step");
+
+  var f1 = el("div","field");
+  var lab = el("label","", "What should we call you?");
+  lab.setAttribute("for","ob-name");
+  var inp = el("input","input");
+  inp.id = "ob-name"; inp.type = "text"; inp.placeholder = "Your name"; inp.maxLength = 32;
+  inp.value = state.me.name || "";
+  f1.appendChild(lab); f1.appendChild(inp);
+  step.appendChild(f1);
+
+  var f2 = el("div","field");
+  f2.appendChild(el("label","","Who do you pray to?"));
+  var pick = el("button","asrow");
+  pick.type = "button";
+  pick.id = "ob-faith";
+  paintFaithRow(pick);
+  pick.addEventListener("click", function(){ openFaithSheet(function(){ paintFaithRow(pick); }); });
+  f2.appendChild(pick);
+  f2.appendChild(el("div","hint","You can change this any time, and set a different one on any single topic."));
+  step.appendChild(f2);
+
+  var go2 = el("button","btn btn-primary btn-block");
+  go2.type = "button";
+  go2.textContent = "Start praying";
+  go2.addEventListener("click", function(){
+    var nm = inp.value.trim();
+    if (!nm){ inp.focus(); toast("Your name, first"); return; }
+    state.me.name = nm;
+    state.onboarded = true;
+    save();
+    go("topics");
+  });
+  step.appendChild(go2);
+  step.appendChild(el("p","hint","MyPrayers counts intentions, not merit. No tradition is ranked above another, and nobody is asked to pray to anything but their own."));
+
+  wrap.appendChild(step);
+  root.appendChild(wrap);
+  setTimeout(function(){ inp.focus(); }, 60);
+}
+
+/* the app's own mark: a mala, which every counting tradition shares */
+function appMark(){
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(NS,"svg");
+  svg.setAttribute("viewBox","0 0 60 60");
+  svg.setAttribute("class","mark");
+  svg.setAttribute("aria-hidden","true");
+  for (var i = 0; i < 12; i++){
+    var a = (-90 + i * 30) * Math.PI / 180;
+    var c = document.createElementNS(NS,"circle");
+    c.setAttribute("cx", (30 + 23 * Math.cos(a)).toFixed(2));
+    c.setAttribute("cy", (30 + 23 * Math.sin(a)).toFixed(2));
+    c.setAttribute("r", i === 0 ? "4.6" : "3.1");
+    if (i > 4) c.setAttribute("class","dim");
+    svg.appendChild(c);
+  }
+  return svg;
+}
+
+function paintFaithRow(row){
+  row.textContent = "";
+  var t = myTradition();
+  var g = el("span","g", t.mark);
+  g.style.setProperty("--f", t.color);
+  g.className = "g f";
+  row.appendChild(g);
+  var who = el("span","who", state.me.deity);
+  row.appendChild(who);
+  row.appendChild(el("span","faint", t.name));
+  row.appendChild(el("span","sw","Change"));
+}
+
+/* ============================================================
+   7. Faith sheet
+   ============================================================ */
+
+function openSheet(title, build){
+  var scrim = document.getElementById("scrim");
+  var sheet = document.getElementById("sheet");
+  sheet.textContent = "";
+
+  var head = el("div","sheet-head");
+  head.appendChild(el("h3","", title));
+  var x = el("button","iconbtn");
+  x.type = "button"; x.setAttribute("aria-label","Close");
+  x.appendChild(icon(ICONS.close));
+  x.addEventListener("click", closeSheet);
+  head.appendChild(x);
+  sheet.appendChild(head);
+
+  var body = el("div","sheet-body");
+  build(body);
+  sheet.appendChild(body);
+
+  scrim.classList.add("open");
+}
+function closeSheet(){ document.getElementById("scrim").classList.remove("open"); }
+
+function deityList(currentTradId, currentDeity, onPick){
+  var list = el("div","tradlist");
+  TRADITIONS.forEach(function(t){
+    var head = el("div","tradgroup");
+    var g = el("span","g f", t.mark);
+    g.style.setProperty("--f", t.color);
+    head.appendChild(g);
+    head.appendChild(el("span","n", t.name));
+    head.appendChild(el("span","rule"));
+    list.appendChild(head);
+
+    t.deities.forEach(function(d){
+      var b = el("button","trad");
+      b.type = "button";
+      var av = el("span","g fbg", t.mark);
+      av.style.setProperty("--f", t.color);
+      b.appendChild(av);
+      var nm = el("span","nm");
+      nm.appendChild(el("span","a", d));
+      nm.appendChild(el("span","b", t.name));
+      b.appendChild(nm);
+      if (currentTradId === t.id && currentDeity === d) b.setAttribute("aria-pressed","true");
+      b.addEventListener("click", function(){ onPick(t, d); });
+      list.appendChild(b);
+    });
+  });
+  return list;
+}
+
+function openFaithSheet(after){
+  openSheet("Who do you pray to?", function(body){
+    body.appendChild(deityList(state.me.tradition, state.me.deity, function(t, d){
+      state.me.tradition = t.id;
+      state.me.deity = d;
+      save();
+      closeSheet();
+      if (after) after();
+    }));
+  });
+}
+
+/* ============================================================
+   8. Topics list
+   ============================================================ */
+
+var topicRefs = {};
+
+function renderTopics(root){
+  var wrap = el("div","cards");
+  topicRefs = {};
+  var sorted = state.topics.slice().sort(function(a,b){ return b.created - a.created; });
+
+  sorted.forEach(function(t){
+    var card = el("button","card");
+    card.type = "button";
+
+    var head = el("div","card-head");
+    var grow = el("div","grow");
+    grow.appendChild(el("h2","display", t.title));
+    grow.appendChild(el("div","place", t.place));
+    head.appendChild(grow);
+
+    var tal = el("div","card-tally");
+    var talN = el("span","n num", fmt(topicTotal(t)));
+    tal.appendChild(talN);
+    tal.appendChild(el("span","l","prayers"));
+    head.appendChild(tal);
+    card.appendChild(head);
+
+    card.appendChild(el("p","need", t.need));
+
+    var foot = el("div","card-foot");
+    foot.appendChild(el("span","tag", t.category));
+    var mixWrap = el("div");
+    mixWrap.style.flex = "1";
+    mixWrap.style.minWidth = "0";
+    mixWrap.appendChild(mixBar(t.tally, false));
+    foot.appendChild(mixWrap);
+    var tail;
+    if (t.mine > 0){
+      tail = el("span","yours");
+      tail.appendChild(el("span","num", fmt(t.mine)));
+      tail.appendChild(el("span",null,"yours"));
+    } else {
+      tail = el("span","meta", fmt(t.participants) + " people");
+    }
+    foot.appendChild(tail);
+    card.appendChild(foot);
+
+    topicRefs[t.id] = {total:talN, mixWrap:mixWrap, tail:tail};
+    card.addEventListener("click", function(){ go("topic", t.id); });
+    wrap.appendChild(card);
+  });
+
+  root.appendChild(wrap);
+  var note = el("p","note");
+  note.textContent = "Topics stay open until whoever raised them closes them. Prayers already counted are never removed.";
+  root.appendChild(note);
+}
+
+/* ============================================================
+   9. A topic — the prayer screen
+   ============================================================ */
+
+var stageRefs = null;   /* live nodes for the topic currently on screen */
+
+function prayerIdentity(t){
+  var tid = t.myTrad || state.me.tradition;
+  return {trad: TRAD[tid] || myTradition(), deity: t.myDeity || state.me.deity};
+}
+
+function renderTopic(root, t){
+  if (!t){ root.appendChild(el("div","empty","That topic is no longer open.")); return; }
+
+  var id = prayerIdentity(t);
+
+  /* --- the counting stage --- */
+  var stage = el("div","stage");
+
+  var total = el("div","total");
+  var totalN = el("div","n num", fmt(topicTotal(t)));
+  total.appendChild(totalN);
+  total.appendChild(el("div","l","prayers offered"));
+  stage.appendChild(total);
+
+  var mala = el("div","mala");
+  mala.appendChild(buildMalaSvg());
+  var ripple = el("div","ripple");
+  mala.appendChild(ripple);
+  var motes = el("div","motes");
+  mala.appendChild(motes);
+
+  var btn = el("button","pray");
+  btn.type = "button";
+  btn.setAttribute("aria-label","Offer a prayer for " + t.title);
+  btn.style.setProperty("--f", id.trad.color);
+  var glyph = el("span","glyph", id.trad.mark);
+  btn.appendChild(glyph);
+  btn.appendChild(el("span","word display","Pray"));
+  btn.appendChild(el("span","to", "to " + id.deity));
+  mala.appendChild(btn);
+  stage.appendChild(mala);
+
+  var roundline = el("div","roundline");
+  stage.appendChild(roundline);
+
+  /* praying-as row */
+  var asrow = el("button","asrow");
+  asrow.type = "button";
+  asrow.style.width = "100%";
+  asrow.addEventListener("click", function(){ openTopicFaithSheet(t); });
+  stage.appendChild(asrow);
+
+  root.appendChild(stage);
+
+  stageRefs = {topicId:t.id, totalN:totalN, roundline:roundline, motes:motes, ripple:ripple, btn:btn, glyph:glyph, asrow:asrow};
+  paintRoundline(t);
+  paintAsRow(t);
+
+  bindPray(btn, t, mala);
+
+  /* --- what we are praying for --- */
+  var s0 = el("div","section");
+  var h0 = el("div","section-head");
+  h0.appendChild(el("h3",null,"What we're holding"));
+  h0.appendChild(el("span","eyebrow","opened " + ago(t.created)));
+  s0.appendChild(h0);
+  var need = el("p","muted", t.need);
+  need.style.fontSize = "14px";
+  need.style.lineHeight = "1.6";
+  s0.appendChild(need);
+  root.appendChild(s0);
+
+  /* --- faith breakdown --- */
+  var s1 = el("div","section");
+  var h1 = el("div","section-head");
+  h1.appendChild(el("h3",null,"Who is praying"));
+  h1.appendChild(el("span","eyebrow", tallyRows(t.tally).length + " traditions"));
+  s1.appendChild(h1);
+  s1.appendChild(mixBar(t.tally, true));
+  var legend = el("div","legend");
+  legend.id = "legend";
+  s1.appendChild(legend);
+  paintLegend(t, legend);
+  root.appendChild(s1);
+  stageRefs.legend = legend;
+
+  /* --- leaderboard --- */
+  var s2 = el("div","section");
+  var h2 = el("div","section-head");
+  h2.appendChild(el("h3",null,"Most prayers offered"));
+  s2.appendChild(h2);
+  var people = el("div","people");
+  s2.appendChild(people);
+  paintPeople(t, people);
+  root.appendChild(s2);
+  stageRefs.people = people;
+
+  /* --- live feed --- */
+  var s3 = el("div","section");
+  var h3 = el("div","section-head");
+  h3.appendChild(el("h3",null,"As it happens"));
+  s3.appendChild(h3);
+  var feed = el("div","feed");
+  s3.appendChild(feed);
+  paintFeed(t, feed);
+  root.appendChild(s3);
+  stageRefs.feed = feed;
+
+  var note = el("p","note");
+  note.textContent = "Hold the button down to keep praying. Twenty-seven beads make a round; four rounds make a full mala of 108.";
+  root.appendChild(note);
+}
+
+function buildMalaSvg(){
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.createElementNS(NS,"svg");
+  svg.setAttribute("viewBox","0 0 300 300");
+  svg.setAttribute("aria-hidden","true");
+  var track = document.createElementNS(NS,"circle");
+  track.setAttribute("cx","150"); track.setAttribute("cy","150"); track.setAttribute("r","132");
+  track.setAttribute("class","track");
+  svg.appendChild(track);
+  for (var i = 0; i < BEADS_PER_ROUND; i++){
+    var a = (-90 + i * (360 / BEADS_PER_ROUND)) * Math.PI / 180;
+    var c = document.createElementNS(NS,"circle");
+    c.setAttribute("cx", (150 + 132 * Math.cos(a)).toFixed(2));
+    c.setAttribute("cy", (150 + 132 * Math.sin(a)).toFixed(2));
+    c.setAttribute("r", i === 0 ? "7.5" : "5.5");
+    c.setAttribute("class", i === 0 ? "bead head" : "bead");
+    c.setAttribute("data-i", String(i));
+    svg.appendChild(c);
+  }
+  return svg;
+}
+
+function paintBeads(t){
+  if (!stageRefs) return;
+  /* a finished round shows every bead lit, then the next prayer starts a new one */
+  var inRound = t.mine % BEADS_PER_ROUND;
+  if (inRound === 0 && t.mine > 0) inRound = BEADS_PER_ROUND;
+  var beads = stageRefs.btn.parentNode.querySelectorAll(".bead");
+  for (var i = 0; i < beads.length; i++){
+    var idx = Number(beads[i].getAttribute("data-i"));
+    if (idx === 0) continue;
+    beads[i].classList.toggle("lit", idx <= inRound);
+  }
+}
+
+function paintRoundline(t){
+  if (!stageRefs) return;
+  var line = stageRefs.roundline;
+  line.textContent = "";
+  var malas = Math.floor(t.mine / (BEADS_PER_ROUND * ROUNDS_PER_MALA));
+  var inRound = t.mine % BEADS_PER_ROUND;
+  var done = Math.floor(t.mine / BEADS_PER_ROUND);
+  /* the bead that closes a round still belongs to that round */
+  if (inRound === 0 && t.mine > 0) done -= 1;
+  var rounds = done % ROUNDS_PER_MALA;
+  if (t.mine === 0){
+    line.appendChild(el("span",null,"Tap a bead's worth. Nobody counts but you."));
+  } else {
+    var b1 = el("b","num", inRound === 0 ? String(BEADS_PER_ROUND) : String(inRound));
+    line.appendChild(el("span",null,"Bead "));
+    line.appendChild(b1);
+    line.appendChild(el("span",null," of " + BEADS_PER_ROUND + " · round " + (rounds + 1) + " of " + ROUNDS_PER_MALA));
+    if (malas > 0){
+      line.appendChild(el("span","faint","·"));
+      var b2 = el("b",null, malas + (malas === 1 ? " mala" : " malas"));
+      line.appendChild(b2);
+    }
+  }
+  paintBeads(t);
+}
+
+function paintAsRow(t){
+  if (!stageRefs) return;
+  var row = stageRefs.asrow;
+  var id = prayerIdentity(t);
+  row.textContent = "";
+  var g = el("span","g f", id.trad.mark);
+  g.style.setProperty("--f", id.trad.color);
+  row.appendChild(g);
+  row.appendChild(el("span","who", "Praying to " + id.deity));
+  var mine = el("span","faint", t.mine > 0 ? fmt(t.mine) + " so far" : "not yet started");
+  row.appendChild(mine);
+  row.appendChild(el("span","sw","Change"));
+}
+
+function openTopicFaithSheet(t){
+  openSheet("Pray to someone else here", function(body){
+    var intro = el("p","hint","This changes who you address on “" + t.title + "” only. Prayers already counted keep the tradition they were offered in.");
+    intro.style.marginBottom = "12px";
+    body.appendChild(intro);
+    var cur = prayerIdentity(t);
+    body.appendChild(deityList(cur.trad.id, cur.deity, function(tr, d){
+      t.myTrad = tr.id; t.myDeity = d;
+      save(); closeSheet();
+      if (stageRefs && stageRefs.topicId === t.id){
+        stageRefs.btn.style.setProperty("--f", tr.color);
+        stageRefs.glyph.textContent = tr.mark;
+        stageRefs.btn.querySelector(".to").textContent = "to " + d;
+        paintAsRow(t);
+      }
+    }));
+  });
+}
+
+function paintLegend(t, node){
+  node.textContent = "";
+  var rows = tallyRows(t.tally);
+  var total = rows.reduce(function(a,r){ return a + r.count; }, 0) || 1;
+  rows.forEach(function(r){
+    var row = el("div","legend-row");
+    var d = el("span","dot fbg");
+    d.style.setProperty("--f", r.trad.color);
+    row.appendChild(d);
+    row.appendChild(el("span","nm", r.trad.name));
+    row.appendChild(el("span","ct num", fmt(r.count)));
+    row.appendChild(el("span","pc num", (r.count / total * 100).toFixed(1) + "%"));
+    node.appendChild(row);
+  });
+}
+
+function paintPeople(t, node){
+  node.textContent = "";
+  var list = t.people.slice().sort(function(a,b){ return b.count - a.count; }).slice(0, 8);
+  var meRow = {name:state.me.name || "You", tradition:prayerIdentity(t).trad.id, deity:prayerIdentity(t).deity, count:t.mine, me:true};
+  var shown = list.slice();
+  if (!shown.some(function(p){ return p.me; })) shown.push(meRow);
+  shown.forEach(function(p){
+    var tr = TRAD[p.tradition] || TRADITIONS[4];
+    var row = el("div","person" + (p.me ? " me" : ""));
+    var av = el("span","av fbg", tr.mark);
+    av.style.setProperty("--f", tr.color);
+    row.appendChild(av);
+    var who = el("span","who");
+    who.appendChild(el("span","n", p.me ? (state.me.name || "You") + " · you" : p.name));
+    who.appendChild(el("span","d", p.deity + " · " + tr.name));
+    row.appendChild(who);
+    row.appendChild(el("span","ct num", fmt(p.count)));
+    node.appendChild(row);
+  });
+}
+
+function paintFeed(t, node){
+  node.textContent = "";
+  if (!t.feed.length){
+    node.appendChild(el("div","empty","Quiet for the moment."));
+    return;
+  }
+  t.feed.slice(0, 12).forEach(function(f){
+    var tr = TRAD[f.tradition] || TRADITIONS[4];
+    var item = el("div","feed-item");
+    var g = el("span","g f", tr.mark);
+    g.style.setProperty("--f", tr.color);
+    item.appendChild(g);
+    var tx = el("span","tx");
+    tx.appendChild(el("b", null, f.name));
+    tx.appendChild(document.createTextNode(" offered " + fmt(f.n) + (f.n === 1 ? " prayer" : " prayers") + " to " + f.deity));
+    item.appendChild(tx);
+    item.appendChild(el("span","t", ago(f.t)));
+    node.appendChild(item);
+  });
+}
+
+/* ============================================================
+   10. Praying
+   ============================================================ */
+
+function bindPray(btn, t, mala){
+  var holdTimer = null, repeatTimer = null, held = 0;
+  void mala;
+
+  function down(e){
+    if (e.button != null && e.button !== 0) return;
+    e.preventDefault();
+    btn.classList.add("down");
+    held = 0;
+    pray(t);
+    holdTimer = setTimeout(function(){
+      repeatTimer = setInterval(function(){
+        held++;
+        pray(t);
+      }, 105);
+    }, 420);
+  }
+  function up(){
+    btn.classList.remove("down");
+    clearTimeout(holdTimer); clearInterval(repeatTimer);
+    holdTimer = repeatTimer = null;
+  }
+
+  btn.addEventListener("pointerdown", down);
+  btn.addEventListener("pointerup", up);
+  btn.addEventListener("pointercancel", up);
+  btn.addEventListener("pointerleave", up);
+  btn.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+  btn.addEventListener("keydown", function(e){
+    if (e.key === " " || e.key === "Enter"){ e.preventDefault(); if (!e.repeat || e.key === " ") pray(t); }
+  });
+}
+
+var flushTimer = null;
+function pray(t){
+  var id = prayerIdentity(t);
+  var wasNew = t.mine === 0;
+
+  t.mine += 1;
+  t.tally[id.trad.id] = (t.tally[id.trad.id] || 0) + 1;
+  state.total += 1;
+
+  var mine = null;
+  for (var i=0;i<t.people.length;i++) if (t.people[i].me) mine = t.people[i];
+  if (!mine){
+    mine = {name:state.me.name || "You", tradition:id.trad.id, deity:id.deity, count:0, me:true};
+    t.people.push(mine);
+    t.participants += 1;
+  }
+  mine.count += 1;
+  mine.tradition = id.trad.id;
+  mine.deity = id.deity;
+
+  var key = todayKey();
+  if (state.me.days.indexOf(key) === -1) state.me.days.push(key);
+
+  if (stageRefs && stageRefs.topicId === t.id){
+    stageRefs.totalN.textContent = fmt(topicTotal(t));
+    stageRefs.totalN.classList.add("bump");
+    setTimeout(function(){ stageRefs && stageRefs.totalN.classList.remove("bump"); }, 90);
+    spawnMote(stageRefs.motes, id.trad.color);
+    paintRoundline(t);
+    paintAsRow(t);
+
+    if (t.mine % BEADS_PER_ROUND === 0){
+      stageRefs.ripple.classList.remove("go");
+      void stageRefs.ripple.offsetWidth;
+      stageRefs.ripple.classList.add("go");
+      var malas = t.mine / (BEADS_PER_ROUND * ROUNDS_PER_MALA);
+      toast(malas === Math.floor(malas) ? "A full mala — 108 prayers" : "Round complete — " + BEADS_PER_ROUND + " beads");
+    }
+    /* refresh the heavier panels at a calmer rate */
+    if (!flushTimer) flushTimer = setTimeout(function(){
+      flushTimer = null;
+      if (stageRefs && stageRefs.topicId === t.id){
+        var bar = stageRefs.legend.previousSibling;
+        if (bar && bar.className && bar.className.indexOf("mix") === 0) bar.replaceWith(mixBar(t.tally, true));
+        paintLegend(t, stageRefs.legend);
+        paintPeople(t, stageRefs.people);
+      }
+    }, 700);
+  }
+
+  if (wasNew) toast("You joined " + t.title);
+  if (navigator.vibrate) { try { navigator.vibrate(6); } catch (e){} }
+  save();
+}
+
+function spawnMote(host, color){
+  if (host.childElementCount > 14) return;
+  var m = el("span","mote","+1");
+  m.style.setProperty("--dx", (Math.random() * 56 - 28).toFixed(0) + "px");
+  m.style.setProperty("--f", color);
+  m.style.color = "color-mix(in srgb, var(--f), var(--lift-col) var(--lift))";
+  m.style.left = (46 + Math.random() * 8) + "%";
+  host.appendChild(m);
+  m.addEventListener("animationend", function(){ m.remove(); });
+  setTimeout(function(){ if (m.parentNode) m.remove(); }, 1400);
+}
+
+/* ============================================================
+   11. New topic
+   ============================================================ */
+
+function renderCreate(root){
+  var wrap = el("div","section");
+  wrap.style.paddingBottom = "28px";
+  var form = el("form","stack");
+  form.style.gap = "18px";
+  form.noValidate = true;
+
+  function field(labelText, node, hint){
+    var f = el("div","field");
+    var l = el("label","", labelText);
+    f.appendChild(l);
+    f.appendChild(node);
+    if (hint) f.appendChild(el("div","hint", hint));
+    return f;
+  }
+
+  var title = el("input","input");
+  title.type = "text"; title.maxLength = 70; title.placeholder = "Floods in Nepal";
+  var place = el("input","input");
+  place.type = "text"; place.maxLength = 60; place.placeholder = "Koshi & Bagmati river basins";
+  var need = el("textarea","textarea");
+  need.maxLength = 400;
+  need.placeholder = "Say plainly what you are asking people to hold. A few sentences is plenty.";
+
+  var cats = el("div","chips");
+  var chosen = CATEGORIES[0];
+  CATEGORIES.forEach(function(c){
+    var b = el("button","chip", c);
+    b.type = "button";
+    if (c === chosen) b.setAttribute("aria-pressed","true");
+    b.addEventListener("click", function(){
+      chosen = c;
+      Array.prototype.forEach.call(cats.children, function(k){ k.removeAttribute("aria-pressed"); });
+      b.setAttribute("aria-pressed","true");
+    });
+    cats.appendChild(b);
+  });
+
+  form.appendChild(field("Topic", title, "What are we praying about?"));
+  form.appendChild(field("Where", place, "A place, a hospital, a household — or “Everywhere”."));
+  form.appendChild(field("The ask", need));
+  form.appendChild(field("Kind", cats));
+
+  var submit = el("button","btn btn-primary btn-block");
+  submit.type = "submit";
+  submit.textContent = "Open this topic";
+  form.appendChild(submit);
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var ti = title.value.trim();
+    if (!ti){ title.focus(); toast("Give the topic a name"); return; }
+    if (!need.value.trim()){ need.focus(); toast("Say what we're praying for"); return; }
+    var t = {
+      id:"t" + nowMs().toString(36),
+      title:ti,
+      place:place.value.trim() || "Everywhere",
+      category:chosen,
+      need:need.value.trim(),
+      participants:1,
+      created:nowMs(),
+      mine:0, people:[], tally:{}, feed:[],
+      author:state.me.name
+    };
+    state.topics.push(t);
+    save();
+    toast("Topic opened");
+    go("topic", t.id);
+  });
+
+  wrap.appendChild(form);
+  root.appendChild(wrap);
+
+  var note = el("p","note");
+  note.textContent = "Whoever opens a topic looks after it. Write it so a stranger from any tradition can pray it in their own words.";
+  root.appendChild(note);
+}
+
+/* ============================================================
+   12. You
+   ============================================================ */
+
+function renderYou(root){
+  var s = el("div","section");
+
+  var idRow = el("button","asrow");
+  idRow.type = "button";
+  idRow.style.width = "100%";
+  idRow.style.marginTop = "0";
+  paintFaithRow(idRow);
+  idRow.addEventListener("click", function(){ openFaithSheet(function(){ paintFaithRow(idRow); render(); }); });
+  s.appendChild(idRow);
+
+  var joined = state.topics.filter(function(t){ return t.mine > 0; });
+  var malas = Math.floor(state.total / (BEADS_PER_ROUND * ROUNDS_PER_MALA));
+
+  var grid = el("div","statgrid");
+  grid.style.marginTop = "16px";
+  [[fmt(state.total), "prayers offered"],
+   [fmt(malas), malas === 1 ? "mala completed" : "malas completed"],
+   [fmt(joined.length), "topics joined"],
+   [fmt(state.me.days.length), state.me.days.length === 1 ? "day praying" : "days praying"]
+  ].forEach(function(p){
+    var st = el("div","stat");
+    st.appendChild(el("div","n num", p[0]));
+    st.appendChild(el("div","l", p[1]));
+    grid.appendChild(st);
+  });
+  s.appendChild(grid);
+  root.appendChild(s);
+
+  var s2 = el("div","section");
+  var h = el("div","section-head");
+  h.appendChild(el("h3",null,"Where your prayers went"));
+  s2.appendChild(h);
+  if (!joined.length){
+    s2.appendChild(el("div","empty","You haven't prayed on a topic yet. Open one and hold the bead."));
+  } else {
+    var list = el("div","people");
+    joined.sort(function(a,b){ return b.mine - a.mine; }).forEach(function(t){
+      var tr = TRAD[t.myTrad || state.me.tradition] || myTradition();
+      var row = el("button","person");
+      row.type = "button";
+      row.style.width = "100%";
+      row.style.textAlign = "left";
+      var av = el("span","av fbg", tr.mark);
+      av.style.setProperty("--f", tr.color);
+      row.appendChild(av);
+      var who = el("span","who");
+      who.appendChild(el("span","n", t.title));
+      who.appendChild(el("span","d", fmt(topicTotal(t)) + " prayers in all · " + t.category.toLowerCase()));
+      row.appendChild(who);
+      row.appendChild(el("span","ct num", fmt(t.mine)));
+      row.addEventListener("click", function(){ go("topic", t.id); });
+      list.appendChild(row);
+    });
+    s2.appendChild(list);
+  }
+  root.appendChild(s2);
+
+  var s3 = el("div","section");
+  s3.style.paddingBottom = "8px";
+  var reset = el("button","btn btn-ghost btn-block");
+  reset.type = "button";
+  reset.textContent = "Reset this prototype";
+  reset.addEventListener("click", function(){
+    if (!window.confirm("Clear your name, your prayers and any topics you opened?")) return;
+    try { localStorage.removeItem(STORE_KEY); } catch (e){}
+    state = freshState();
+    view = {name:"topics", topicId:null};
+    render();
+  });
+  s3.appendChild(reset);
+  root.appendChild(s3);
+
+  var note = el("p","note");
+  note.textContent = "This is a prototype. Everything lives in this browser only — nothing is sent anywhere, and the other people you see praying are simulated.";
+  root.appendChild(note);
+}
+
+/* ============================================================
+   13. The rest of the world, praying
+   ============================================================ */
+
+function otherPrayer(){
+  var open = state.topics;
+  if (!open.length) return;
+
+  /* the topic you are looking at gets most of the traffic, so the
+     screen feels alive while you are on it */
+  var t;
+  if (view.name === "topic" && Math.random() < 0.65){
+    t = topicById(view.topicId) || open[Math.floor(Math.random() * open.length)];
+  } else {
+    t = open[Math.floor(Math.random() * open.length)];
+  }
+  if (!t) return;
+
+  var candidates = t.people.filter(function(p){ return !p.me; });
+  var person;
+  if (candidates.length && Math.random() < 0.7){
+    person = candidates[Math.floor(Math.random() * candidates.length)];
+  } else {
+    var p = POOL[Math.floor(Math.random() * POOL.length)];
+    person = {name:p[0], tradition:p[1], deity:p[2], count:0};
+    var already = t.people.filter(function(x){ return x.name === person.name; })[0];
+    if (already) person = already;
+    else { t.people.push(person); t.participants += 1; }
+  }
+
+  var n = 1 + Math.floor(Math.random() * Math.random() * 26);
+  person.count += n;
+  t.tally[person.tradition] = (t.tally[person.tradition] || 0) + n;
+  t.feed.unshift({name:person.name, tradition:person.tradition, deity:person.deity, n:n, t:nowMs()});
+  if (t.feed.length > 40) t.feed.length = 40;
+
+  if (view.name === "topic" && stageRefs && stageRefs.topicId === t.id){
+    stageRefs.totalN.textContent = fmt(topicTotal(t));
+    var bar = stageRefs.legend.previousSibling;
+    if (bar && bar.className && String(bar.className).indexOf("mix") === 0) bar.replaceWith(mixBar(t.tally, true));
+    paintLegend(t, stageRefs.legend);
+    paintPeople(t, stageRefs.people);
+    paintFeed(t, stageRefs.feed);
+  } else if (view.name === "topics" && topicRefs[t.id]){
+    var ref = topicRefs[t.id];
+    ref.total.textContent = fmt(topicTotal(t));
+    ref.mixWrap.textContent = "";
+    ref.mixWrap.appendChild(mixBar(t.tally, false));
+    if (t.mine === 0) ref.tail.textContent = fmt(t.participants) + " people";
+  }
+  save();
+}
+
+var worldTimer = null;
+function startWorld(){
+  if (worldTimer) clearTimeout(worldTimer);
+  var tick = function(){
+    otherPrayer();
+    worldTimer = setTimeout(tick, 1400 + Math.random() * 3600);
+  };
+  worldTimer = setTimeout(tick, 900);
+}
+
+/* keep relative timestamps honest without redrawing everything */
+setInterval(function(){
+  if (view.name !== "topic" || !stageRefs) return;
+  var t = topicById(view.topicId);
+  if (t) paintFeed(t, stageRefs.feed);
+}, 30000);
+
+/* ============================================================
+   14. Router
+   ============================================================ */
+
+function go(name, topicId){
+  view = {name:name, topicId:topicId || null};
+  render();
+  var screen = document.getElementById("screen");
+  screen.scrollTop = 0;
+}
+
+function render(){
+  var screen = document.getElementById("screen");
+  screen.textContent = "";
+  stageRefs = null;
+  renderChrome();
+
+  if (!state.onboarded){ renderOnboard(screen); return; }
+
+  if (view.name === "topics") renderTopics(screen);
+  else if (view.name === "topic") renderTopic(screen, topicById(view.topicId));
+  else if (view.name === "create") renderCreate(screen);
+  else if (view.name === "you") renderYou(screen);
+  else renderTopics(screen);
+}
+
+/* ============================================================
+   15. Boot
+   ============================================================ */
+
+document.getElementById("scrim").addEventListener("click", function(e){
+  if (e.target === e.currentTarget) closeSheet();
+});
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape") closeSheet();
+});
+
+state = load();
+if (!state.me.days || !state.me.days.length) state.me.days = [todayKey()];
+if (state.me.days.indexOf(todayKey()) === -1) state.me.days.push(todayKey());
+render();
+startWorld();
+
+})();
+</script>
+</body>
+</html>
