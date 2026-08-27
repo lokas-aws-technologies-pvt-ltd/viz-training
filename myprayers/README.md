@@ -7,6 +7,11 @@ the topic as a whole.
 
 Open `index.html` in a browser. Nothing to install, no server, no build step.
 
+> **Read [`Concept-Note.html`](Concept-Note.html) first.** It supersedes the framing below. This
+> prototype implements the counting engine only; the concept note covers what the product is
+> actually for — being there for someone when you can't be — and the parts still to be designed:
+> the recipient's view, consent, the synchronised moment, and how a circle ends.
+
 ---
 
 ## What it does
